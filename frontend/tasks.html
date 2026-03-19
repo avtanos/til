@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Задачи — TIL</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a href="index.html" class="nav-logo">TIL</a>
+        <div class="nav-links">
+          <a href="index.html" data-i18n="nav_editor">Редактор</a>
+          <a href="tasks.html" class="active" data-i18n="nav_tasks">Задачи</a>
+          <a href="semantics.html" data-i18n="nav_semantics">Семантика языка</a>
+        </div>
+        <div class="nav-lang">
+          <select id="langSelect" class="lang-select" aria-label="Язык интерфейса">
+            <option value="ru">Русский</option>
+            <option value="ky">Кыргызский</option>
+          </select>
+        </div>
+      </nav>
+
+      <header class="tasks-header">
+        <h1 data-i18n="tasks_title">Задачи</h1>
+        <p class="muted" data-i18n="tasks_subtitle">20 олимпиадных задач для языка TIL</p>
+      </header>
+
+      <section class="card">
+        <div class="task-list" id="taskList">
+          <p class="muted">Загрузка...</p>
+        </div>
+      </section>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="tasks.js"></script>
+  </body>
+</html>

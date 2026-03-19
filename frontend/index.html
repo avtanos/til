@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TIL - Олимпиадный язык</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a href="index.html" class="nav-logo">TIL</a>
+        <div class="nav-links">
+          <a href="index.html" class="active" data-i18n="nav_editor">Редактор</a>
+          <a href="tasks.html" data-i18n="nav_tasks">Задачи</a>
+          <a href="semantics.html" data-i18n="nav_semantics">Семантика языка</a>
+        </div>
+        <div class="nav-lang">
+          <select id="langSelect" class="lang-select" aria-label="Язык интерфейса">
+            <option value="ru">Русский</option>
+            <option value="ky">Кыргызский</option>
+          </select>
+        </div>
+      </nav>
+
+      <header>
+        <h1 data-i18n="editor_title">TIL MVP</h1>
+        <p class="subtitle muted" data-i18n="editor_subtitle">Язык с кыргызскими ключевыми словами + интерпретатор на сервере</p>
+      </header>
+
+      <div id="taskContext" class="task-context" style="display: none;">
+        <div class="task-context-title" id="taskContextTitle"></div>
+        <div class="muted small" id="taskContextStatement"></div>
+        <div class="muted small" style="margin-top: 6px;">
+          <span data-i18n="task_input_label">Ввод:</span> <code id="taskContextInput"></code> → <span data-i18n="task_output_label">Вывод:</span> <code id="taskContextOutput"></code>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-title" data-i18n="card_code">Код</div>
+          <textarea id="code" spellcheck="false"></textarea>
+          <div class="btn-row">
+            <button id="compileBtn" class="btn-secondary" data-i18n="compile_btn">Проверить синтаксис</button>
+            <button id="runBtn" class="primary" data-i18n="run_btn">Запустить</button>
+          </div>
+          <div class="small muted" data-i18n="format_hint">Формат: `башкы()` или функции `функция ...`</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" data-i18n="card_input">Ввод</div>
+          <textarea id="input"></textarea>
+          <div class="card-title" data-i18n="card_output">Вывод</div>
+          <pre id="output" class="output"></pre>
+          <div class="card-title" data-i18n="card_errors">Ошибки / Проверка синтаксиса</div>
+          <pre id="error" class="error"></pre>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="card-title" data-i18n="examples_title">Примеры</div>
+        <div class="examples">
+          <button class="example" data-name="min" data-i18n="ex_min">Минимум: echo</button>
+          <button class="example" data-name="cmp" data-i18n="ex_cmp">if/else: сравнение</button>
+          <button class="example" data-name="sum" data-i18n="ex_sum">for: сумма 1..n</button>
+          <button class="example" data-name="fact" data-i18n="ex_fact">функция: факториал</button>
+          <button class="example" data-name="while" data-i18n="ex_while">качан: отсчет</button>
+          <button class="example" data-name="dowhile" data-i18n="ex_dowhile">жаса..качан: счетчик</button>
+          <button class="example" data-name="logic" data-i18n="ex_logic">жана/же/эмес</button>
+          <button class="example" data-name="arrsum" data-i18n="ex_arrsum">тизме: сумма</button>
+          <button class="example" data-name="strlen" data-i18n="ex_strlen">узундук: длина строки</button>
+          <button class="example" data-name="cont" data-i18n="ex_cont">улантуу/токтот</button>
+        </div>
+        <div class="small muted" style="margin-top: 8px" data-i18n="examples_hint">
+          В MVP для `окуу()` чтение идет по токенам, разделенным пробелами/переводами строк.
+        </div>
+      </section>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
+

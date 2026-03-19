@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Семантика языка TIL — Синтаксис на кыргызском и русском</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a href="index.html" class="nav-logo">TIL</a>
+        <div class="nav-links">
+          <a href="index.html" data-i18n="nav_editor">Редактор</a>
+          <a href="tasks.html" data-i18n="nav_tasks">Задачи</a>
+          <a href="semantics.html" class="active" data-i18n="nav_semantics">Семантика языка</a>
+        </div>
+        <div class="nav-lang">
+          <select id="langSelect" class="lang-select" aria-label="Язык интерфейса">
+            <option value="ru">Русский</option>
+            <option value="ky">Кыргызский</option>
+          </select>
+        </div>
+      </nav>
+
+      <header class="semantics-header">
+        <h1 data-i18n="semantics_title">Семантика языка TIL</h1>
+        <p class="muted" data-i18n="semantics_subtitle">Детальное описание синтаксиса на кыргызском и русском языках</p>
+      </header>
+
+      <section class="semantics-section">
+        <h2>1. Типы данных / Маалымат түрлөрү</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Кыргызча</th>
+              <th>Русский</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>бүтүн</code></td><td>целое число</td><td>Целые числа (int)</td></tr>
+            <tr><td><code>чыныгы</code></td><td>вещественное</td><td>Дробные числа (float)</td></tr>
+            <tr><td><code>сап</code></td><td>строка</td><td>Текст в кавычках</td></tr>
+            <tr><td><code>белги</code></td><td>символ</td><td>Один символ в одинарных кавычках</td></tr>
+            <tr><td><code>логикалык</code></td><td>логический</td><td>истина (чын) / ложь (жалган)</td></tr>
+            <tr><td><code>тизме&lt;тип&gt;</code></td><td>массив</td><td>Список элементов заданного типа</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="semantics-section">
+        <h2>2. Управляющие конструкции / Башкаруу конструкциялары</h2>
+
+        <h3>Условие (эгер) / Шарт (if)</h3>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">эгер (шарт) {
+    операторлор;
+} болбосо {
+    операторлор;
+}</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">если (условие) {
+    операторы;
+} иначе {
+    операторы;
+}</pre>
+          </div>
+        </div>
+
+        <h3>Цикл с параметром (үчүн) / Цикл for</h3>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">үчүн (бүтүн i = 0; i < n; i = i + 1) {
+    операторлор;
+}</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">для (int i = 0; i < n; i = i + 1) {
+    операторы;
+}</pre>
+          </div>
+        </div>
+
+        <h3>Цикл с условием (качан) / Цикл while</h3>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">качан (шарт) {
+    операторлор;
+}</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">пока (условие) {
+    операторы;
+}</pre>
+          </div>
+        </div>
+
+        <h3>Цикл с постусловием (жаса…качан) / Цикл do-while</h3>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">жаса {
+    операторлор;
+} качан (шарт);</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">делай {
+    операторы;
+} пока (условие);</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="semantics-section">
+        <h2>3. Логические операторы / Логикалык операторлор</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Кыргызча</th>
+              <th>Символ</th>
+              <th>Русский</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>жана</code></td><td><code>&&</code></td><td>логическое И (and)</td></tr>
+            <tr><td><code>же</code></td><td><code>||</code></td><td>логическое ИЛИ (or)</td></tr>
+            <tr><td><code>эмес</code></td><td><code>!</code></td><td>логическое НЕ (not)</td></tr>
+            <tr><td><code>чын</code></td><td>—</td><td>истина (true)</td></tr>
+            <tr><td><code>жалган</code></td><td>—</td><td>ложь (false)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="semantics-section">
+        <h2>4. Функции / Функциялар</h2>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">функция аталышы(бүтүн a, бүтүн b) {
+    кайтар a + b;
+}
+
+башкы() {
+    бүтүн жыйынтык = аталышы(5, 3);
+    чыгар(жыйынтык);
+}</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">функция имя(целое a, целое b) {
+    вернуть a + b;
+}
+
+главная() {
+    целое результат = имя(5, 3);
+    вывести(результат);
+}</pre>
+          </div>
+        </div>
+        <p class="small muted">Точка входа программы — функция <code>башкы()</code> (главная).</p>
+      </section>
+
+      <section class="semantics-section">
+        <h2>5. Ввод и вывод / Киргизүү жана чыгаруу</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Кыргызча</th>
+              <th>Русский</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>окуу()</code></td><td>читать()</td><td>Читает значение из stdin, тип — по переменной слева</td></tr>
+            <tr><td><code>чыгар(маани)</code></td><td>вывести(значение)</td><td>Печатает значение в stdout</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block">бүтүн n = окуу();   // Читаем целое
+сап ат = окуу();    // Читаем строку
+чыгар(n);           // Печатаем n</pre>
+      </section>
+
+      <section class="semantics-section">
+        <h2>6. Массивы / Тизмелер</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Кыргызча</th>
+              <th>Русский</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>тизме&lt;бүтүн&gt; a = [1, 2, 3];</code></td><td>массив целых a = [1, 2, 3];</td></tr>
+            <tr><td><code>a[0]</code></td><td>Доступ по индексу (с 0)</td></tr>
+            <tr><td><code>узундук(a)</code></td><td>Длина массива или строки</td></tr>
+          </tbody>
+        </table>
+        <pre class="code-block">тизме&lt;бүтүн&gt; сандар = [10, 20, 30];
+чыгар(сандар[0]);        // 10
+чыгар(узундук(сандар));  // 3</pre>
+      </section>
+
+      <section class="semantics-section">
+        <h2>7. Операторы управления циклом / Циклди башкаруу</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Кыргызча</th>
+              <th>Русский</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>токтот;</code></td><td>break — выход из цикла</td></tr>
+            <tr><td><code>улантуу;</code></td><td>continue — переход к следующей итерации</td></tr>
+            <tr><td><code>кайтар маани;</code></td><td>return — возврат из функции</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="semantics-section">
+        <h2>8. Арифметика и сравнения / Арифметика жана салыштыруу</h2>
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>Операция</th>
+              <th>Символ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Сложение</td><td><code>+</code></td></tr>
+            <tr><td>Вычитание</td><td><code>-</code></td></tr>
+            <tr><td>Умножение</td><td><code>*</code></td></tr>
+            <tr><td>Деление</td><td><code>/</code></td></tr>
+            <tr><td>Остаток</td><td><code>%</code></td></tr>
+            <tr><td>Равно</td><td><code>==</code></td></tr>
+            <tr><td>Не равно</td><td><code>!=</code></td></tr>
+            <tr><td>Больше / меньше</td><td><code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="semantics-section">
+        <h2>9. Комментарии / Комментарийлер</h2>
+        <pre class="code-block">// Бири саптуу комментарий
+/* Көп саптуу
+   комментарий */</pre>
+      </section>
+
+      <section class="semantics-section">
+        <h2>10. Пример полной программы / Толук программанын үлгүсү</h2>
+        <pre class="code-block">функция кош(бүтүн a, бүтүн b) {
+    кайтар a + b;
+}
+
+башкы() {
+    бүтүн x = окуу();
+    бүтүн y = окуу();
+
+    эгер (x > y) {
+        чыгар(x);
+    } болбосо {
+        чыгар(кош(x, y));
+    }
+}</pre>
+      </section>
+    </div>
+    <script src="i18n.js"></script>
+  </body>
+</html>
