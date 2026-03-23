@@ -14,6 +14,7 @@ class TokenType(str, Enum):
     RBRACKET = "]"
     COMMA = ","
     SEMI = ";"
+    DOT = "."
 
     # Operators
     PLUS = "+"
@@ -34,6 +35,15 @@ class TokenType(str, Enum):
     OR = "||"
     NOT = "!"
 
+    # Shorthand / C++-style
+    INC = "++"
+    DEC = "--"
+    PLUSEQ = "+="
+    MINUSEQ = "-="
+    STAREQ = "*="
+    SLASHEQ = "/="
+    PERCENTEQ = "%="
+
     # Identifiers / literals
     IDENT = "IDENT"
     INT = "INT"
@@ -42,6 +52,7 @@ class TokenType(str, Enum):
     CHAR = "CHAR"
 
     # Keywords (Кыргызстанский MVP)
+    CLASS = "класс"
     FUNC = "функция"
     IF = "эгер"
     ELSE = "болбосо"

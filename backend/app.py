@@ -105,7 +105,7 @@ def api_run(req: RunRequest):
     try:
         ast = parse(code)
         compiled: CompiledProgram = compile_program(ast)
-        ctx = CompiledCtx(functions=compiled.functions, function_return_types=compiled.function_return_types, main_stmts=compiled.main_stmts)
+        ctx = CompiledCtx(classes=compiled.classes, functions=compiled.functions, function_return_types=compiled.function_return_types, main_stmts=compiled.main_stmts, input_expected_types=compiled.input_expected_types)
         interpreter = Interpreter(ctx=ctx, input_text=req.input or "")
         output = interpreter.run()
         save_run(code=code, input_text=req.input, output_text=output, error_text=None, status="ok")

@@ -22,8 +22,16 @@ class Stmt:
 
 @dataclass(frozen=True, slots=True)
 class Program:
+    classes: list["ClassDef"]
     functions: list["FunctionDef"]
     main_stmts: list[Stmt]
+
+
+@dataclass(frozen=True, slots=True)
+class ClassDef:
+    name: str
+    fields: list[tuple[Type, str]]  # (type, name)
+    loc: NodeLoc
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +63,15 @@ class Assign(Stmt):
     loc: NodeLoc
 
 
+@dataclass(frozen=True, slots=True)
+class AssignOp(Stmt):
+    """x += y, x -= y, etc."""
+    target: "LValue"
+    op: str  # +=, -=, *=, /=, %=
+    value: Expr
+    loc: NodeLoc
+
+
 class LValue:
     loc: NodeLoc
 
@@ -69,6 +86,14 @@ class VarRef(Expr, LValue):
 class IndexRef(LValue):
     array: VarRef
     index: Expr
+    loc: NodeLoc
+
+
+@dataclass(frozen=True, slots=True)
+class DotRef(LValue):
+    """obj.field for assignment"""
+    obj: Expr
+    field: str
     loc: NodeLoc
 
 
@@ -91,7 +116,7 @@ class WhileStmt(Stmt):
 class ForStmt(Stmt):
     init: Stmt  # VarDecl or Assign
     cond: Expr
-    step: Assign
+    step: Stmt  # Assign or AssignOp
     body: list[Stmt]
     loc: NodeLoc
 
@@ -140,6 +165,15 @@ class UnaryOp(Expr):
 
 
 @dataclass(frozen=True, slots=True)
+class IncDecExpr(Expr):
+    """++i, i++, --i, i--"""
+    op: str  # "++" or "--"
+    target: "LValue"
+    is_postfix: bool  # True for i++, False for ++i
+    loc: NodeLoc
+
+
+@dataclass(frozen=True, slots=True)
 class BinOp(Expr):
     op: str
     left: Expr
@@ -172,6 +206,14 @@ class ArrayLiteral(Expr):
 class IndexExpr(Expr):
     array: Expr  # typically VarRef
     index: Expr
+    loc: NodeLoc
+
+
+@dataclass(frozen=True, slots=True)
+class DotExpr(Expr):
+    """obj.field for reading"""
+    obj: Expr
+    field: str
     loc: NodeLoc
 
 

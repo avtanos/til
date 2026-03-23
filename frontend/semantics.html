@@ -10,10 +10,10 @@
     <div class="page">
       <header class="topbar">
         <a href="index.html" class="brand">
-          <img src="assets/logo.png" alt="TIL MVP — Simple UX/UI" class="brand-logo" />
+          <img src="assets/logo.png" alt="TIL MVP — Кыргызча код жазуу" class="brand-logo" />
           <div class="brand-copy">
             <strong>TIL MVP</strong>
-            <span>Simple UX/UI</span>
+            <span>Кыргызча код жазуу</span>
           </div>
         </a>
 
@@ -87,13 +87,13 @@
         <div class="bilingual">
           <div>
             <strong>Кыргызча:</strong>
-            <pre class="code-block">үчүн (бүтүн i = 0; i < n; i = i + 1) {
+            <pre class="code-block">үчүн (бүтүн i = 0; i < n; i += 1) {
     операторлор;
 }</pre>
           </div>
           <div>
             <strong>Русский:</strong>
-            <pre class="code-block">для (int i = 0; i < n; i = i + 1) {
+            <pre class="code-block">для (int i = 0; i < n; i += 1) {
     операторы;
 }</pre>
           </div>
@@ -192,13 +192,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>окуу()</code></td><td>читать()</td><td>Читает значение из stdin, тип — по переменной слева</td></tr>
+            <tr><td><code>окуу()</code></td><td>читать()</td><td>Читает значение из stdin по ожидаемому типу: числа/логика/символ — 1-й токен строки; <code>сап</code> — вся строка; <code>тизме</code> — элементы через пробелы</td></tr>
             <tr><td><code>чыгар(маани)</code></td><td>вывести(значение)</td><td>Печатает значение в stdout</td></tr>
           </tbody>
         </table>
-        <pre class="code-block">бүтүн n = окуу();   // Читаем целое
-сап ат = окуу();    // Читаем строку
-чыгар(n);           // Печатаем n</pre>
+        <pre class="code-block">бүтүн a = окуу();   // 1-й токен 1-й строки
+бүтүн b = окуу();   // 1-й токен 2-й строки
+сап s = окуу();     // вся строка
+тизме&lt;бүтүн&gt; t = окуу(); // split по пробелам</pre>
       </section>
 
       <section class="semantics-section">
@@ -216,13 +217,51 @@
             <tr><td><code>узундук(a)</code></td><td>Длина массива или строки</td></tr>
           </tbody>
         </table>
-        <pre class="code-block">тизме&lt;бүтүн&gt; сандар = [10, 20, 30];
-чыгар(сандар[0]);        // 10
-чыгар(узундук(сандар));  // 3</pre>
+        <pre class="code-block">тизме&lt;бүтүн&gt; a = [];              // пустой список (тип обязателен)
+тизме&lt;бүтүн&gt; b = [1, 2, 3];     // тип элементов выводится из литерала
+
+чыгар(узундук(a));        // 0
+чыгар(b[1]);              // 2</pre>
       </section>
 
       <section class="semantics-section">
-        <h2>7. Операторы управления циклом / Циклди башкаруу</h2>
+        <h2>7. Классы / Класстар</h2>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">класс Point {
+    бүтүн x;
+    чыныгы y;
+}
+
+башкы() {
+    Point p;
+    p.x = 5;
+    p.y = 3.14;
+    чыгар(p.x);
+    чыгар(p.y);
+}</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">класс Point {
+    бүтүн x;
+    чыныгы y;
+}
+
+башкы() {
+    Point p;
+    p.x = 5;
+    p.y = 3.14;
+    чыгар(p.x);
+    чыгар(p.y);
+}</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="semantics-section">
+        <h2>8. Операторы управления циклом / Циклди башкаруу</h2>
         <table class="syntax-table">
           <thead>
             <tr>
@@ -239,7 +278,7 @@
       </section>
 
       <section class="semantics-section">
-        <h2>8. Арифметика и сравнения / Арифметика жана салыштыруу</h2>
+        <h2>9. Арифметика и сравнения / Арифметика жана салыштыруу</h2>
         <table class="syntax-table">
           <thead>
             <tr>
@@ -261,14 +300,48 @@
       </section>
 
       <section class="semantics-section">
-        <h2>9. Комментарии / Комментарийлер</h2>
+        <h2>10. ++/-- и составные присваивания / ++/-- жана татаал дайындоо</h2>
+        <div class="bilingual">
+          <div>
+            <strong>Кыргызча:</strong>
+            <pre class="code-block">++i, i++   // i = i + 1 (префикс/постфикс)
+--i, i--   // i = i - 1
+
+x += y;    // x = x + y
+x -= y;
+x *= y;
+x /= y;
+x %= y;    // тек бүтүн
+
+сап s = "a";
+s += "b";   // сапты конкатенация</pre>
+          </div>
+          <div>
+            <strong>Русский:</strong>
+            <pre class="code-block">++i, i++   // i = i + 1 (prefix/postfix)
+--i, i--   // i = i - 1
+
+x += y;    // x = x + y
+x -= y;
+x *= y;
+x /= y;
+x %= y;    // только для целых
+
+сап s = "a";
+s += "b";   // конкатенация строк</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="semantics-section">
+        <h2>11. Комментарии / Комментарийлер</h2>
         <pre class="code-block">// Бири саптуу комментарий
 /* Көп саптуу
    комментарий */</pre>
       </section>
 
       <section class="semantics-section">
-        <h2>10. Пример полной программы / Толук программанын үлгүсү</h2>
+        <h2>12. Пример полной программы / Толук программанын үлгүсү</h2>
         <pre class="code-block">функция кош(бүтүн a, бүтүн b) {
     кайтар a + b;
 }

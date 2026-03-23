@@ -11,6 +11,7 @@ class TypeKind(str, Enum):
     CHAR = "белги"
     BOOL = "логикалык"
     LIST = "тизме"
+    CLASS = "CLASS"  # user-defined class
     VOID = "VOID"
     UNKNOWN = "UNKNOWN"
 
@@ -19,10 +20,13 @@ class TypeKind(str, Enum):
 class Type:
     kind: TypeKind
     item: "Type | None" = None  # for LIST
+    class_name: str | None = None  # for CLASS
 
     def __str__(self) -> str:
         if self.kind == TypeKind.LIST and self.item is not None:
             return f"тизме<{self.item}>"
+        if self.kind == TypeKind.CLASS and self.class_name:
+            return self.class_name
         return self.kind.value
 
     @staticmethod
@@ -35,7 +39,10 @@ class Type:
             "логикалык": TypeKind.BOOL,
             "тизме": TypeKind.LIST,
         }
-        return Type(kind=m.get(name, TypeKind.UNKNOWN))
+        k = m.get(name)
+        if k is not None:
+            return Type(kind=k)
+        return Type(kind=TypeKind.CLASS, class_name=name)
 
     @staticmethod
     def list_of(item: "Type") -> "Type":
@@ -66,5 +73,7 @@ def types_equal(a: Type, b: Type) -> bool:
         return False
     if a.kind == TypeKind.LIST:
         return a.item == b.item
+    if a.kind == TypeKind.CLASS:
+        return a.class_name == b.class_name
     return True
 

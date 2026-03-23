@@ -6,14 +6,20 @@ from dataclasses import dataclass
 from .ast import (
     ArrayLiteral,
     Assign,
+    AssignOp,
     BinOp,
     BreakStmt,
     CallExpr,
+    CastExpr,
+    ClassDef,
     ContinueStmt,
     DoWhileStmt,
+    DotExpr,
+    DotRef,
     Expr,
     ExprStmt,
     FunctionDef,
+    IncDecExpr,
     IfStmt,
     IndexExpr,
     IndexRef,
@@ -27,7 +33,6 @@ from .ast import (
     VarRef,
     WhileStmt,
     ForStmt,
-    CastExpr,
 )
 from .errors import TILRuntimeError
 from .typesys import Type, TypeKind
@@ -53,9 +58,11 @@ class _ContinueSignal(Exception):
 
 @dataclass
 class CompiledCtx:
+    classes: dict[str, ClassDef]
     functions: dict[str, FunctionDef]
     function_return_types: dict[str, Type]
     main_stmts: list[Stmt]
+    input_expected_types: dict[tuple[int, int], Type] | None = None
 
 
 class Interpreter:
@@ -115,6 +122,10 @@ class Interpreter:
             return False
         if t.kind == TypeKind.LIST:
             return []
+        if t.kind == TypeKind.CLASS and t.class_name and self.ctx.classes:
+            cls = self.ctx.classes.get(t.class_name)
+            if cls:
+                return {fn: self._default_value(ft) for ft, fn in cls.fields}
         return None
 
     def _format_value(self, v: object) -> str:
@@ -238,7 +249,11 @@ class Interpreter:
             return
 
         if isinstance(s, Assign):
-            self._exec_assign(s)
+            self._exec_assign(s, classes=self.ctx.classes or {})
+            return
+
+        if isinstance(s, AssignOp):
+            self._exec_assign_op(s)
             return
 
         if isinstance(s, IfStmt):
@@ -285,7 +300,10 @@ class Interpreter:
                 except _ContinueSignal:
                     pass
                 # step executed even after continue (like C)
-                self._exec_assign(s.step)
+                if isinstance(s.step, Assign):
+                    self._exec_assign(s.step)
+                else:
+                    self._exec_assign_op(s.step)
             return
 
         if isinstance(s, DoWhileStmt):
@@ -321,7 +339,26 @@ class Interpreter:
 
         raise TILRuntimeError("Ката: непредвиденный оператор.")
 
-    def _exec_assign(self, a: Assign) -> None:
+    def _exec_assign(self, a: Assign, classes: dict[str, ClassDef] | None = None) -> None:
+        classes = classes or {}
+        if isinstance(a.target, DotRef):
+            obj_v = self._eval_expr(a.target.obj)
+            if not isinstance(obj_v, dict):
+                raise TILRuntimeError("Ката: талаа текст объект үчүн гана.")
+            if a.target.field not in obj_v:
+                raise TILRuntimeError(f"Ката: '{a.target.field}' талаасы жок.")
+            v = self._eval_expr(a.value)
+            # get field type from class for casting
+            if isinstance(a.target.obj, VarRef) and classes:
+                t, _ = self._env_get(a.target.obj.name)
+                if t.kind == TypeKind.CLASS and t.class_name in classes:
+                    cls = classes[t.class_name]
+                    field_t = next((ft for ft, fn in cls.fields if fn == a.target.field), None)
+                    if field_t:
+                        v = self._cast_value(v, field_t, loc=a.loc)
+            obj_v[a.target.field] = v
+            return
+
         if isinstance(a.target, VarRef):
             t, _old = self._env_get(a.target.name)
             v = self._eval_expr(a.value)
@@ -347,25 +384,132 @@ class Interpreter:
 
         raise TILRuntimeError("Ката: присваивание үчүн левосторонняя часть туура эмес.")
 
+    def _exec_assign_op(self, a: AssignOp) -> None:
+        """x += y → x = x + y; string += concat; numeric += -=% *=% /=% %= """
+        if isinstance(a.target, VarRef):
+            t, old = self._env_get(a.target.name)
+            v = self._eval_expr(a.value)
+            if a.op == "+=":
+                if t.kind == TypeKind.STRING:
+                    v = self._cast_value(v, t, loc=a.loc)
+                    new = (old if isinstance(old, str) else str(old)) + (v if isinstance(v, str) else str(v))
+                else:
+                    v = self._cast_value(v, t, loc=a.loc)
+                    if not isinstance(old, (int, float)) or isinstance(old, bool):
+                        raise TILRuntimeError("Ката: '+=' сан үчүн гана.")
+                    if not isinstance(v, (int, float)) or isinstance(v, bool):
+                        raise TILRuntimeError("Ката: '+=' сан үчүн гана.")
+                    new = old + v
+            elif a.op == "-=":
+                v = self._cast_value(v, t, loc=a.loc)
+                new = self._cast_value((old if isinstance(old, (int, float)) else 0) - (v if isinstance(v, (int, float)) else 0), t, loc=a.loc)
+            elif a.op == "*=":
+                v = self._cast_value(v, t, loc=a.loc)
+                new = self._cast_value((old if isinstance(old, (int, float)) else 0) * (v if isinstance(v, (int, float)) else 0), t, loc=a.loc)
+            elif a.op == "/=":
+                v = self._cast_value(v, t, loc=a.loc)
+                rv = v if isinstance(v, (int, float)) else 0
+                if rv == 0:
+                    raise TILRuntimeError("Ката: нөлгө бөлүү мүмкүн эмес.")
+                new = (old if isinstance(old, (int, float)) else 0) / rv
+                new = self._cast_value(new, t, loc=a.loc)
+            elif a.op == "%=":
+                v = self._cast_value(v, t, loc=a.loc)
+                lo = old if isinstance(old, int) and not isinstance(old, bool) else 0
+                ro = v if isinstance(v, int) and not isinstance(v, bool) else 0
+                if ro == 0:
+                    raise TILRuntimeError("Ката: нөлгө бөлүү мүмкүн эмес.")
+                new = lo % ro
+            else:
+                raise TILRuntimeError("Ката: белгисиз AssignOp.")
+            self._env_set(a.target.name, new, t)
+            return
+
+        if isinstance(a.target, IndexRef):
+            arr_t, arr_v = self._env_get(a.target.array.name)
+            idx_v = self._cast_value(self._eval_expr(a.target.index), Type.from_name("бүтүн"), loc=a.loc)
+            if not isinstance(idx_v, int) or idx_v < 0 or idx_v >= len(arr_v):
+                raise TILRuntimeError("Ката: индекс тизменин чегинен чыгып кетти.")
+            item_t = arr_t.item or Type.unknown()
+            old = arr_v[idx_v]
+            v = self._eval_expr(a.value)
+            v = self._cast_value(v, item_t, loc=a.loc)
+            if a.op == "+=":
+                if item_t.kind == TypeKind.STRING:
+                    new = (old if isinstance(old, str) else str(old)) + (v if isinstance(v, str) else str(v))
+                else:
+                    new = (old if isinstance(old, (int, float)) else 0) + (v if isinstance(v, (int, float)) else 0)
+            elif a.op == "-=":
+                new = (old if isinstance(old, (int, float)) else 0) - (v if isinstance(v, (int, float)) else 0)
+            elif a.op == "*=":
+                new = (old if isinstance(old, (int, float)) else 0) * (v if isinstance(v, (int, float)) else 0)
+            elif a.op == "/=":
+                rv = v if isinstance(v, (int, float)) else 0
+                if rv == 0:
+                    raise TILRuntimeError("Ката: нөлгө бөлүү мүмкүн эмес.")
+                new = (old if isinstance(old, (int, float)) else 0) / rv
+            elif a.op == "%=":
+                ro = v if isinstance(v, int) and not isinstance(v, bool) else 0
+                if ro == 0:
+                    raise TILRuntimeError("Ката: нөлгө бөлүү мүмкүн эмес.")
+                new = (old if isinstance(old, int) and not isinstance(old, bool) else 0) % ro
+            else:
+                raise TILRuntimeError("Ката: белгисиз AssignOp.")
+            arr_v[idx_v] = self._cast_value(new, item_t, loc=a.loc)
+            return
+
+        raise TILRuntimeError("Ката: AssignOp үчүн туура эмес цель.")
+
     # -------------------- Expressions --------------------
 
-    def _read_input_token(self) -> str:
+    def _read_input(self, expected_type: Type | None, loc: object) -> object:
+        """Read one line; parse by expected type: scalar→first token, string→full line, list→whitespace-split."""
         if self.input_i >= len(self.input_lines):
             raise TILRuntimeError("Ката: киргизүү жетишсиз.")
         line = self.input_lines[self.input_i]
         self.input_i += 1
-        return line
+
+        if expected_type is None or expected_type.kind == TypeKind.UNKNOWN:
+            return line
+
+        if expected_type.kind == TypeKind.STRING:
+            return line
+
+        if expected_type.kind == TypeKind.LIST:
+            tokens = line.split()
+            item_t = expected_type.item
+            if item_t is None:
+                return tokens
+            return [self._cast_value(t, item_t, loc=loc) for t in tokens]
+
+        # scalar: int, float, bool, char — first token only
+        tokens = line.split()
+        if not tokens:
+            return self._default_value(expected_type)
+        first = tokens[0]
+        return self._cast_value(first, expected_type, loc=loc)
 
     def _eval_expr(self, e: Expr):
         if isinstance(e, Literal):
             return e.value
 
         if isinstance(e, InputExpr):
-            return self._read_input_token()
+            expected = None
+            if self.ctx.input_expected_types:
+                expected = self.ctx.input_expected_types.get((e.loc.line, e.loc.column))
+            return self._read_input(expected, e.loc)
 
         if isinstance(e, VarRef):
             _t, v = self._env_get(e.name)
             return v
+
+        if isinstance(e, DotExpr):
+            obj_v = self._eval_expr(e.obj)
+            if not isinstance(obj_v, dict):
+                raise TILRuntimeError("Ката: талаа текст объект үчүн гана.")
+            if e.field not in obj_v:
+                raise TILRuntimeError(f"Ката: '{e.field}' талаасы жок.")
+            return obj_v[e.field]
 
         if isinstance(e, CastExpr):
             v = self._eval_expr(e.expr)
@@ -382,6 +526,37 @@ class Interpreter:
             if idx_v < 0 or idx_v >= len(arr_v):  # type: ignore[arg-type]
                 raise TILRuntimeError("Ката: индекс тизменин чегинен чыгып кетти.")
             return arr_v[idx_v]  # type: ignore[index]
+
+        if isinstance(e, IncDecExpr):
+            if isinstance(e.target, VarRef):
+                t, old = self._env_get(e.target.name)
+                if not isinstance(old, (int, float)) or isinstance(old, bool):
+                    raise TILRuntimeError("Ката: ++/-- сан үчүн гана.")
+                delta = 1 if e.op == "++" else -1
+                new = self._cast_value(
+                    (old + delta) if isinstance(old, float) else (int(old) + delta),
+                    t,
+                    loc=e.loc,
+                )
+                self._env_set(e.target.name, new, t)
+                return old if e.is_postfix else new
+
+            arr_t, arr_v = self._env_get(e.target.array.name)
+            idx_v = self._cast_value(self._eval_expr(e.target.index), Type.from_name("бүтүн"), loc=e.loc)
+            if not isinstance(idx_v, int) or idx_v < 0 or idx_v >= len(arr_v):
+                raise TILRuntimeError("Ката: индекс тизменин чегинен чыгып кетти.")
+            old = arr_v[idx_v]
+            if not isinstance(old, (int, float)) or isinstance(old, bool):
+                raise TILRuntimeError("Ката: ++/-- сан үчүн гана.")
+            item_t = arr_t.item or Type.from_name("бүтүн")
+            delta = 1 if e.op == "++" else -1
+            new = self._cast_value(
+                (old + delta) if isinstance(old, float) else (int(old) + delta),
+                item_t,
+                loc=e.loc,
+            )
+            arr_v[idx_v] = new
+            return old if e.is_postfix else new
 
         if isinstance(e, UnaryOp):
             r = self._eval_expr(e.right)

@@ -4,15 +4,22 @@ from dataclasses import dataclass
 
 from .ast import (
     ArrayLiteral,
+    Assign,
+    AssignOp,
     BinOp,
     Block,
     CallExpr,
     CastExpr,
+    ClassDef,
     DoWhileStmt,
+    DotExpr,
+    DotRef,
     ExprStmt,
     ForStmt,
     FunctionDef,
+    IncDecExpr,
     IndexExpr,
+    IndexRef,
     IfStmt,
     InputExpr,
     Literal,
@@ -26,8 +33,6 @@ from .ast import (
     WhileStmt,
     BreakStmt,
     ContinueStmt,
-    Assign,
-    IndexRef,
 )
 from .errors import TILCompileError
 from .lexer import tokenize
@@ -85,7 +90,7 @@ TYPE_TOKENS = {
 
 def parse_type(ps: ParserState) -> Type:
     tok = ps.peek()
-    if tok.type not in TYPE_TOKENS:
+    if tok.type not in TYPE_TOKENS and tok.type != TokenType.IDENT:
         raise TILCompileError("Ожидалась типовая спецификация.", tok.line, tok.column)
 
     if tok.type == TokenType.TYPE_LIST:
@@ -100,22 +105,41 @@ def parse_type(ps: ParserState) -> Type:
     return Type.from_name(tok.value)
 
 
+def parse_class(ps: ParserState) -> "ClassDef":
+    ps.expect(TokenType.CLASS, "Ожидалось 'класс'.")
+    name_tok = ps.expect(TokenType.IDENT, "Ожидалось имя класса.")
+    ps.expect(TokenType.LBRACE, "Ожидался '{' после имени класса.")
+    fields: list[tuple[Type, str]] = []
+    while ps.peek().type != TokenType.RBRACE:
+        if ps.at_end():
+            raise TILCompileError("Класс не закрыт.", name_tok.line, name_tok.column)
+        field_type = parse_type(ps)
+        field_name = ps.expect(TokenType.IDENT, "Ожидалось имя поля.")
+        ps.expect(TokenType.SEMI, "Ожидался ';' после поля.")
+        fields.append((field_type, field_name.value))
+    ps.expect(TokenType.RBRACE, "Ожидался '}' после полей класса.")
+    return ClassDef(name=name_tok.value, fields=fields, loc=_loc(name_tok))
+
+
 def parse(source: str) -> Program:
     tokens = tokenize(source)
     ps = ParserState(tokens=tokens)
+    classes: list[ClassDef] = []
     functions: list[FunctionDef] = []
     main_stmts: list[Stmt] = []
 
     while not ps.at_end():
         tok = ps.peek()
-        if tok.type == TokenType.FUNC:
+        if tok.type == TokenType.CLASS:
+            classes.append(parse_class(ps))
+        elif tok.type == TokenType.FUNC:
             functions.append(parse_function(ps))
         elif tok.type == TokenType.IDENT and tok.value == "башкы":
             functions.append(parse_entry_function(ps))
         else:
             main_stmts.append(parse_statement(ps))
 
-    return Program(functions=functions, main_stmts=main_stmts)
+    return Program(classes=classes, functions=functions, main_stmts=main_stmts)
 
 
 def parse_entry_function(ps: ParserState) -> FunctionDef:
@@ -163,8 +187,9 @@ def parse_block(ps: ParserState) -> Block:
 def parse_statement(ps: ParserState) -> Stmt:
     tok = ps.peek()
 
-    # variable declaration
-    if tok.type in TYPE_TOKENS:
+    # variable declaration: "Type Name" or "Type<...> Name" - second token is IDENT or LT (for тизме<...>)
+    sec = ps.peek(1).type
+    if (tok.type in TYPE_TOKENS or tok.type == TokenType.IDENT) and (sec == TokenType.IDENT or sec == TokenType.LT):
         var_type = parse_type(ps)
         name_tok = ps.expect(TokenType.IDENT, "Ожидалось имя переменной.")
         init_expr = None
@@ -200,10 +225,16 @@ def parse_statement(ps: ParserState) -> Stmt:
             ps.expect(TokenType.SEMI, "Ожидался ';' после выражения.")
             return ExprStmt(expr=expr, loc=_loc(tok))
 
-        # Иначе пробуем распарсить lvalue и проверить '='.
+        # Иначе пробуем распарсить lvalue и проверить '=' или +=, -=, и т.д.
         lval_start = tok
         lvalue = parse_lvalue(ps)
-        if ps.peek().type == TokenType.ASSIGN:
+        assign_op_type = ps.peek().type
+        if assign_op_type in ASSIGN_OPS:
+            ps.advance()
+            value = parse_expression(ps)
+            ps.expect(TokenType.SEMI, "Ожидался ';' после присваивания.")
+            return AssignOp(target=lvalue, op=ASSIGN_OPS[assign_op_type], value=value, loc=_loc(lval_start))
+        if assign_op_type == TokenType.ASSIGN:
             ps.advance()  # consume '='
             value = parse_expression(ps)
             ps.expect(TokenType.SEMI, "Ожидался ';' после присваивания.")
@@ -220,10 +251,32 @@ def parse_statement(ps: ParserState) -> Stmt:
     return ExprStmt(expr=expr, loc=_loc(tok))
 
 
-def lvalue_to_expr(lv: "IndexRef | VarRef"):
+ASSIGN_OPS = {
+    TokenType.PLUSEQ: "+=",
+    TokenType.MINUSEQ: "-=",
+    TokenType.STAREQ: "*=",
+    TokenType.SLASHEQ: "/=",
+    TokenType.PERCENTEQ: "%=",
+}
+
+
+def lvalue_to_expr(lv: "VarRef | IndexRef | DotRef"):
     if isinstance(lv, VarRef):
         return lv
-    return IndexExpr(array=lv.array, index=lv.index, loc=lv.loc)
+    if isinstance(lv, IndexRef):
+        return IndexExpr(array=lv.array, index=lv.index, loc=lv.loc)
+    return DotExpr(obj=lv.obj, field=lv.field, loc=lv.loc)
+
+
+def expr_to_lvalue(expr, tok_for_error) -> "VarRef | IndexRef | DotRef":
+    """Convert expression to LValue; raise if not assignable."""
+    if isinstance(expr, VarRef):
+        return expr
+    if isinstance(expr, IndexExpr) and isinstance(expr.array, VarRef):
+        return IndexRef(array=expr.array, index=expr.index, loc=expr.loc)
+    if isinstance(expr, DotExpr):
+        return DotRef(obj=expr.obj, field=expr.field, loc=expr.loc)
+    raise TILCompileError("++/-- требуют переменную, массив же талаа.", tok_for_error.line, tok_for_error.column)
 
 
 def parse_return(ps: ParserState) -> ReturnStmt:
@@ -264,7 +317,7 @@ def parse_for(ps: ParserState) -> ForStmt:
 
     # init
     init: Stmt
-    if ps.peek().type in TYPE_TOKENS:
+    if ps.peek().type in TYPE_TOKENS or ps.peek().type == TokenType.IDENT:
         init_type = parse_type(ps)
         ident_tok = ps.expect(TokenType.IDENT, "Ожидалось имя переменной в init.")
         ps.expect(TokenType.ASSIGN, "Ожидался '=' в init.")
@@ -280,9 +333,15 @@ def parse_for(ps: ParserState) -> ForStmt:
     cond = parse_expression(ps)
     ps.expect(TokenType.SEMI, "Ожидался ';' после условия в for.")
     step_lv = parse_lvalue(ps)
-    ps.expect(TokenType.ASSIGN, "Ожидался '=' в step.")
-    step_val = parse_expression(ps)
-    step = Assign(target=step_lv, value=step_val, loc=step_lv.loc)
+    step_op = ps.peek().type
+    if step_op in ASSIGN_OPS:
+        ps.advance()
+        step_val = parse_expression(ps)
+        step = AssignOp(target=step_lv, op=ASSIGN_OPS[step_op], value=step_val, loc=step_lv.loc)
+    else:
+        ps.expect(TokenType.ASSIGN, "Ожидался '=' или +=, -= и т.д. в step.")
+        step_val = parse_expression(ps)
+        step = Assign(target=step_lv, value=step_val, loc=step_lv.loc)
     ps.expect(TokenType.RPAREN, "Ожидался ')' после for(...) .")
     body = parse_block(ps).stmts
     return ForStmt(init=init, cond=cond, step=step, body=body, loc=_loc(f))
@@ -300,14 +359,19 @@ def parse_do_while(ps: ParserState) -> DoWhileStmt:
     return DoWhileStmt(body=body, cond=cond, loc=_loc(d))
 
 
-def parse_lvalue(ps: ParserState) -> "VarRef | IndexRef":
+def parse_lvalue(ps: ParserState) -> "VarRef | IndexRef | DotRef":
     ident_tok = ps.expect(TokenType.IDENT, "Ожидалась переменная.")
-    v = VarRef(name=ident_tok.value, loc=_loc(ident_tok))
+    obj: Expr = VarRef(name=ident_tok.value, loc=_loc(ident_tok))
     if ps.match(TokenType.LBRACKET) is not None:
         idx_expr = parse_expression(ps)
         ps.expect(TokenType.RBRACKET, "Ожидался ']' после индекса.")
-        return IndexRef(array=v, index=idx_expr, loc=v.loc)
-    return v
+        obj = IndexExpr(array=obj, index=idx_expr, loc=obj.loc)
+    if ps.match(TokenType.DOT) is not None:
+        field_tok = ps.expect(TokenType.IDENT, "Ожидалось поле.")
+        return DotRef(obj=obj, field=field_tok.value, loc=_loc(ident_tok))
+    if isinstance(obj, VarRef):
+        return obj
+    return IndexRef(array=obj.array, index=obj.index, loc=obj.loc)
 
 
 # -------------------- Expressions --------------------
@@ -380,11 +444,29 @@ def parse_factor(ps: ParserState):
 
 def parse_unary(ps: ParserState):
     tok = ps.peek()
+    if tok.type in {TokenType.INC, TokenType.DEC}:
+        ps.advance()
+        inner = parse_unary(ps)
+        lv = expr_to_lvalue(inner, tok)
+        return IncDecExpr(op=tok.value, target=lv, is_postfix=False, loc=_loc(tok))
     if tok.type in {TokenType.NOT, TokenType.MINUS}:
         ps.advance()
         right = parse_unary(ps)
         return UnaryOp(op="!" if tok.type == TokenType.NOT else "-", right=right, loc=_loc(tok))
-    return parse_primary(ps)
+    return parse_postfix(ps)
+
+
+def parse_postfix(ps: ParserState):
+    base = parse_primary(ps)
+    while ps.peek().type == TokenType.DOT:
+        ps.advance()
+        field_tok = ps.expect(TokenType.IDENT, "Ожидалось поле.")
+        base = DotExpr(obj=base, field=field_tok.value, loc=_loc(field_tok))
+    while ps.peek().type in {TokenType.INC, TokenType.DEC}:
+        op_tok = ps.advance()
+        lv = expr_to_lvalue(base, op_tok)
+        base = IncDecExpr(op=op_tok.value, target=lv, is_postfix=True, loc=_loc(op_tok))
+    return base
 
 
 def parse_primary(ps: ParserState):

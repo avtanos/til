@@ -7,6 +7,7 @@ from .tokens import Token, TokenType
 
 
 KEYWORDS: dict[str, TokenType] = {
+    TokenType.CLASS.value: TokenType.CLASS,
     TokenType.FUNC.value: TokenType.FUNC,
     TokenType.IF.value: TokenType.IF,
     TokenType.ELSE.value: TokenType.ELSE,
@@ -133,6 +134,34 @@ def tokenize(src: str) -> list[Token]:
             add(TokenType.OR, "||", line, col)
             st.advance(2)
             continue
+        if two == "++":
+            add(TokenType.INC, "++", line, col)
+            st.advance(2)
+            continue
+        if two == "--":
+            add(TokenType.DEC, "--", line, col)
+            st.advance(2)
+            continue
+        if two == "+=":
+            add(TokenType.PLUSEQ, "+=", line, col)
+            st.advance(2)
+            continue
+        if two == "-=":
+            add(TokenType.MINUSEQ, "-=", line, col)
+            st.advance(2)
+            continue
+        if two == "*=":
+            add(TokenType.STAREQ, "*=", line, col)
+            st.advance(2)
+            continue
+        if two == "/=":
+            add(TokenType.SLASHEQ, "/=", line, col)
+            st.advance(2)
+            continue
+        if two == "%=":
+            add(TokenType.PERCENTEQ, "%=", line, col)
+            st.advance(2)
+            continue
 
         # single char tokens
         single_map = {
@@ -144,6 +173,7 @@ def tokenize(src: str) -> list[Token]:
             "]": TokenType.RBRACKET,
             ",": TokenType.COMMA,
             ";": TokenType.SEMI,
+            ".": TokenType.DOT,
             "+": TokenType.PLUS,
             "-": TokenType.MINUS,
             "*": TokenType.STAR,
