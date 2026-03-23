@@ -15,12 +15,9 @@ const examples = {
     }
 }`,
   sum: `башкы() {
-    бүтүн n = окуу();
-    бүтүн s = 0;
-    үчүн (бүтүн i = 0; i < n; i = i + 1) {
-        s = s + (i + 1);
-    }
-    чыгар(s);
+    бүтүн x = окуу();
+    x += 5;
+    чыгар(x);
 }`,
 
   fact: `функция факт(бүтүн n) {
@@ -40,7 +37,7 @@ const examples = {
     бүтүн n = окуу();
     качан (n > 0) {
         чыгар(n);
-        n = n - 1;
+        --n;
     }
 }`,
 
@@ -49,7 +46,7 @@ const examples = {
     бүтүн i = 0;
     жаса {
         чыгар(i);
-        i = i + 1;
+        ++i;
     } качан (i < n);
 }`,
 
@@ -71,11 +68,11 @@ const examples = {
     бүтүн n = окуу();
     тизме<бүтүн> a = [10, 20, 30, 40, 50];
     бүтүн s = 0;
-    үчүн (бүтүн i = 0; i < n; i = i + 1) {
+    үчүн (бүтүн i = 0; i < n; i += 1) {
         эгер (i >= узундук(a)) {
             токтот;
         }
-        s = s + a[i];
+        s += a[i];
     }
     чыгар(s);
 }`,
@@ -88,16 +85,34 @@ const examples = {
   cont: `башкы() {
     бүтүн n = окуу();
     бүтүн s = 0;
-    үчүн (бүтүн i = 0; i < n; i = i + 1) {
+    үчүн (бүтүн i = 0; i < n; i += 1) {
         эгер (i % 2 == 0) {
             улантуу;
         }
-        s = s + i;
+        s += i;
         эгер (s > 1000) {
             токтот;
         }
     }
     чыгар(s);
+}`,
+
+  class: `класс Point {
+    бүтүн x;
+    чыныгы y;
+}
+
+башкы() {
+    Point p;
+    p.x = 5;
+    p.y = 3.14;
+    чыгар(p.x);
+}`,
+
+  comments: `башкы() {
+    // линия комментарий
+    бүтүн a = 7; /* блок комментарий */
+    чыгар(a);
 }`,
 };
 
@@ -168,6 +183,7 @@ function formatCode() {
 const INDENT_UNIT = 2;
 
 const TIL_KEYWORDS = new Set([
+  "класс",
   "функция",
   "эгер",
   "болбосо",
@@ -187,7 +203,7 @@ const TIL_BUILTINS = new Set(["окуу", "чыгар", "узундук"]);
 const TIL_BOOLEANS = new Set(["чын", "жалган"]);
 const TIL_MAIN_FN = "башкы";
 
-const OP2 = new Set(["&&", "||", "==", "!=", ">=", "<="]);
+const OP2 = new Set(["&&", "||", "==", "!=", ">=", "<=", "++", "--", "+=", "-=", "*=", "/=", "%="]);
 const OP1 = new Set(["+", "-", "*", "/", "%", "=", "!", ">", "<"]);
 const PUNCT = new Set(["{", "}", "(", ")", "[", "]", ",", ";", ".", "<", ">", ":"]);
 
@@ -734,10 +750,12 @@ function showTaskContext(task) {
   ctx.style.display = "block";
   if (task.example_in) {
     const raw = String(task.example_in ?? "");
-    // With line-based `окуу()`: numeric inputs should go one token per line.
+    // `окуу()` reads one input line per call: if the example contains multiple numbers separated by spaces,
+    // we split them into separate lines so each scalar `окуу()` gets its own token.
     // Heuristic: if example is only numbers separated by whitespace, convert to lines.
     const numericOnly = /^-?\d+(\s+-?\d+)*$/u.test(raw.trim());
-    $("input").value = numericOnly ? raw.replace(/\s+/g, "\n") : raw;
+    const shouldSplit = numericOnly && !task.no_split_numeric_input;
+    $("input").value = shouldSplit ? raw.replace(/\s+/g, "\n") : raw;
   }
 }
 

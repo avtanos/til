@@ -3,17 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TIL MVP — Simple UX/UI</title>
+    <title>TIL MVP — Кыргызча код жазуу</title>
+    <meta name="description" content="Кыргызча программалоо: программирование на кыргызском, праграммирование, Кыргызстан программиронвание, кодирование и курсы на кыргызском. Пишите и запускайте код на TIL — быстро и с обратной связью." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#14d1d1" />
+
+    <meta property="og:title" content="TIL MVP — Кыргызча код жазуу" />
+    <meta property="og:description" content="Кыргызча программалоо: программирование на кыргызском, праграммирование, Кыргызстан программиронвание, кодирование и курсы на кыргызском. TIL — пишите, запускайте и исправляйте ошибки." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TIL MVP" />
+    <meta name="twitter:card" content="summary" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="lang-kg">
     <div class="page">
       <header class="topbar">
         <a href="index.html" class="brand">
-          <img src="assets/logo.png" alt="TIL MVP — Simple UX/UI" class="brand-logo" />
+          <img src="assets/logo.png" alt="TIL MVP — Кыргызча код жазуу" class="brand-logo" />
           <div class="brand-copy">
             <strong>TIL MVP</strong>
-            <span>Simple UX/UI</span>
+            <span>Кыргызча код жазуу</span>
           </div>
         </a>
 
@@ -46,8 +55,11 @@
           <span data-lang="kg">Аз аракет, көбүрөөк түшүнүктүүлүк</span>
         </h1>
         <p>
-          <span data-lang="ru">Страница упрощена: один главный редактор слева и понятная боковая колонка справа. Пользователь сразу видит код, ввод, вывод и ошибки без лишней навигации.</span>
-          <span data-lang="kg">Барак жөнөкөйлөштүрүлдү: сол жакта негизги редактор, оң жакта түшүнүктүү каптал колонка. Колдонуучу дароо кодду, киргизүүнү, чыгышты жана каталарды көрөт.</span>
+          <span data-lang="ru">Запустите TIL сразу: код, ввод, вывод и ошибки — на одной странице.</span>
+          <span data-lang="ru">Миссия системы: учить программированию через короткие задания и мгновенную обратную связь.</span>
+
+          <span data-lang="kg">TILди дароо иштетиңиз: код, киргизүү, чыгаруу жана каталар — бир баракта.</span>
+          <span data-lang="kg">Системанын миссиясы: кыска тапшырмалар жана тез жооп аркылуу программалоону үйрөтүү.</span>
         </p>
       </section>
 
@@ -62,11 +74,7 @@
             </div>
             <div class="card-body">
               <div class="editor-top">
-                <div class="chips">
-                  <div class="chip">TIL v1.0</div>
-                  <div class="chip">stdin</div>
-                  <div class="chip">башкы()</div>
-                </div>
+                <!-- chips removed (TIL v1.0 / stdin / entry fn) -->
               </div>
 
               <div class="code-editor">
@@ -106,14 +114,16 @@
               <div class="examples-grid">
                 <div class="example-card" data-name="min"><strong><span data-lang="ru">Минимальный вывод</span><span data-lang="kg">Минималдуу чыгыш</span></strong><span>чыгар(), башкы()</span></div>
                 <div class="example-card" data-name="cmp"><strong><span data-lang="ru">Условие</span><span data-lang="kg">Шарт</span></strong><span>эгер / болбосо</span></div>
-                <div class="example-card" data-name="sum"><strong><span data-lang="ru">Цикл үчүн</span><span data-lang="kg">үчүн цикл</span></strong><span>1..n суммасы</span></div>
+                <div class="example-card" data-name="sum"><strong><span data-lang="ru">Составное присваивание</span><span data-lang="kg">Татаал дайындоо</span></strong><span>x += y</span></div>
                 <div class="example-card" data-name="fact"><strong><span data-lang="ru">Факториал</span><span data-lang="kg">Факториал</span></strong><span>функция, кайтар</span></div>
-                <div class="example-card" data-name="while"><strong><span data-lang="ru">Цикл качан</span><span data-lang="kg">качан цикл</span></strong><span>отсчёт</span></div>
+                <div class="example-card" data-name="while"><strong><span data-lang="ru">++/--</span><span data-lang="kg">++/--</span></strong><span>--n</span></div>
                 <div class="example-card" data-name="dowhile"><strong><span data-lang="ru">жаса..качан</span><span data-lang="kg">жаса..качан</span></strong><span>постусловие</span></div>
                 <div class="example-card" data-name="logic"><strong><span data-lang="ru">Логика</span><span data-lang="kg">Логика</span></strong><span>жана / же / эмес</span></div>
-                <div class="example-card" data-name="arrsum"><strong><span data-lang="ru">Массив</span><span data-lang="kg">Тизме</span></strong><span>тизме, сумма</span></div>
+                <div class="example-card" data-name="arrsum"><strong><span data-lang="ru">Списки и индексы</span><span data-lang="kg">Тизмелер жана индекстер</span></strong><span>тизме&lt;…&gt; a[i]</span></div>
                 <div class="example-card" data-name="strlen"><strong><span data-lang="ru">Длина строки</span><span data-lang="kg">Сап узундугу</span></strong><span>узундук()</span></div>
                 <div class="example-card" data-name="cont"><strong><span data-lang="ru">улантуу/токтот</span><span data-lang="kg">улантуу/токтот</span></strong><span>continue, break</span></div>
+                <div class="example-card" data-name="class"><strong><span data-lang="ru">Класс и поля</span><span data-lang="kg">Класс жана талаалар</span></strong><span>p.x, p.y</span></div>
+                <div class="example-card" data-name="comments"><strong><span data-lang="ru">Комментарии</span><span data-lang="kg">Комментарийлер</span></strong><span>//, /* */</span></div>
               </div>
             </div>
           </div>
