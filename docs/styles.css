@@ -544,6 +544,19 @@ body.lang-kg [data-lang="kg"] {
   white-space: pre;
 }
 
+/* Inline code / special words on semantics page */
+.syntax-table code,
+.semantics-section code {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  border: 1px solid rgba(20, 209, 209, 0.35);
+  color: var(--primary);
+  white-space: nowrap;
+}
+
 .bilingual {
   display: grid;
   grid-template-columns: 1fr 1fr;
