@@ -296,6 +296,8 @@ textarea {
   caret-color: var(--text);
   overflow: auto;
   font: 14px/1.65 "JetBrains Mono", Consolas, ui-monospace, monospace;
+  white-space: pre;
+  word-break: normal;
 }
 
 .code-editor .code-text:focus {
