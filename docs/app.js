@@ -103,6 +103,7 @@ const examples = {
 
 function setExample(name) {
   $("code").value = examples[name] ?? "";
+  scheduleHighlight(true);
 }
 
 function formatCode() {
@@ -152,6 +153,323 @@ function formatCode() {
 
   // Avoid extra newline at the end (Textarea will display it anyway if user needs).
   textarea.value = out.join("\n").replace(/\s+$/g, "");
+  scheduleHighlight(true);
+}
+
+// -----------------------------
+// Sublime-like editor features:
+// - auto syntax highlight on typing
+// - auto indent on Enter and for lines starting with '}'
+// - colored tokens for language keywords/operators/symbols
+// -----------------------------
+
+const INDENT_UNIT = 2;
+
+const TIL_KEYWORDS = new Set([
+  "функция",
+  "эгер",
+  "болбосо",
+  "качан",
+  "жаса",
+  "үчүн",
+  "токтот",
+  "улантуу",
+  "кайтар",
+  "жана",
+  "же",
+  "эмес",
+]);
+
+const TIL_TYPES = new Set(["бүтүн", "чыныгы", "сап", "белги", "логикалык", "тизме"]);
+const TIL_BUILTINS = new Set(["окуу", "чыгар", "узундук"]);
+const TIL_BOOLEANS = new Set(["чын", "жалган"]);
+const TIL_MAIN_FN = "башкы";
+
+const OP2 = new Set(["&&", "||", "==", "!=", ">=", "<="]);
+const OP1 = new Set(["+", "-", "*", "/", "%", "=", "!", ">", "<"]);
+const PUNCT = new Set(["{", "}", "(", ")", "[", "]", ",", ";", ".", "<", ">", ":"]);
+
+const WORD_CHAR_RE = /[\p{L}\p{M}\p{N}_]/u;
+
+function escapeHtml(s) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function wrapTok(cls, text) {
+  return `<span class="${cls}">${escapeHtml(text)}</span>`;
+}
+
+function tokenizeToHtml(code) {
+  let out = "";
+  let i = 0;
+  const len = code.length;
+
+  while (i < len) {
+    const ch = code[i];
+
+    // Line comment //
+    if (ch === "/" && code[i + 1] === "/") {
+      let j = i + 2;
+      while (j < len && code[j] !== "\n") j++;
+      out += wrapTok("tok-comment", code.slice(i, j));
+      i = j;
+      continue;
+    }
+
+    // String literal "..."
+    if (ch === '"') {
+      let j = i + 1;
+      while (j < len) {
+        if (code[j] === '"' && code[j - 1] !== "\\") {
+          j++;
+          break;
+        }
+        // MVP lexer forbids newline in literals, but we still keep highlighting stable.
+        if (code[j] === "\n") break;
+        j++;
+      }
+      out += wrapTok("tok-str", code.slice(i, j));
+      i = j;
+      continue;
+    }
+
+    // Char literal 'a'
+    if (ch === "'") {
+      let j = i + 1;
+      while (j < len) {
+        if (code[j] === "'" && code[j - 1] !== "\\") {
+          j++;
+          break;
+        }
+        if (code[j] === "\n") break;
+        j++;
+      }
+      out += wrapTok("tok-str", code.slice(i, j));
+      i = j;
+      continue;
+    }
+
+    // Multi-char operators
+    const two = code.slice(i, i + 2);
+    if (OP2.has(two)) {
+      out += wrapTok("tok-op", two);
+      i += 2;
+      continue;
+    }
+
+    // Numbers
+    if (ch >= "0" && ch <= "9") {
+      let j = i + 1;
+      while (j < len && code[j] >= "0" && code[j] <= "9") j++;
+      if (code[j] === "." && j + 1 < len && code[j + 1] >= "0" && code[j + 1] <= "9") {
+        j++;
+        while (j < len && code[j] >= "0" && code[j] <= "9") j++;
+      }
+      out += wrapTok("tok-num", code.slice(i, j));
+      i = j;
+      continue;
+    }
+
+    // Words / identifiers / keywords
+    if (WORD_CHAR_RE.test(ch)) {
+      let j = i + 1;
+      while (j < len && WORD_CHAR_RE.test(code[j])) j++;
+      const word = code.slice(i, j);
+
+      if (TIL_TYPES.has(word)) out += wrapTok("tok-type", word);
+      else if (TIL_KEYWORDS.has(word)) out += wrapTok("tok-kw", word);
+      else if (TIL_BOOLEANS.has(word)) out += wrapTok("tok-bool", word);
+      else if (word === TIL_MAIN_FN || TIL_BUILTINS.has(word)) out += wrapTok("tok-fn", word);
+      else out += escapeHtml(word);
+
+      i = j;
+      continue;
+    }
+
+    // Single-char operators
+    if (OP1.has(ch)) {
+      out += wrapTok("tok-op", ch);
+      i++;
+      continue;
+    }
+
+    // Punctuation/symbols
+    if (PUNCT.has(ch)) {
+      out += wrapTok("tok-punct", ch);
+      i++;
+      continue;
+    }
+
+    out += escapeHtml(ch);
+    i++;
+  }
+
+  return out;
+}
+
+function braceLevelUpTo(text, index) {
+  // Counts `{` and `}` outside of strings/comments.
+  let level = 0;
+  let inLineComment = false;
+  let inDouble = false;
+  let inSingle = false;
+
+  for (let i = 0; i < index; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (inLineComment) {
+      if (ch === "\n") inLineComment = false;
+      continue;
+    }
+
+    if (inDouble) {
+      if (ch === '"' && text[i - 1] !== "\\") inDouble = false;
+      continue;
+    }
+
+    if (inSingle) {
+      if (ch === "'" && text[i - 1] !== "\\") inSingle = false;
+      continue;
+    }
+
+    // Enter comment
+    if (ch === "/" && next === "/") {
+      inLineComment = true;
+      i++; // consume second '/'
+      continue;
+    }
+
+    // Enter strings/chars
+    if (ch === '"') {
+      inDouble = true;
+      continue;
+    }
+    if (ch === "'") {
+      inSingle = true;
+      continue;
+    }
+
+    if (ch === "{") level++;
+    else if (ch === "}") level = Math.max(0, level - 1);
+  }
+
+  return level;
+}
+
+function reindentCurrentLine() {
+  const ta = $("code");
+  if (!ta) return;
+  const value = ta.value ?? "";
+
+  const pos = ta.selectionStart ?? 0;
+  const lineStart = value.lastIndexOf("\n", Math.max(0, pos - 1)) + 1;
+  let lineEnd = value.indexOf("\n", pos);
+  if (lineEnd < 0) lineEnd = value.length;
+
+  const line = value.slice(lineStart, lineEnd);
+  const oldIndentMatch = line.match(/^\s*/);
+  const oldIndentLen = oldIndentMatch ? oldIndentMatch[0].length : 0;
+  const trimmedStart = line.trimStart();
+
+  const baseLevel = braceLevelUpTo(value, lineStart);
+  const desiredLevel = trimmedStart.startsWith("}") ? Math.max(0, baseLevel - 1) : baseLevel;
+  const indentStr = " ".repeat(desiredLevel * INDENT_UNIT);
+  const newLine = indentStr + trimmedStart;
+
+  if (newLine === line) return;
+
+  const newValue = value.slice(0, lineStart) + newLine + value.slice(lineEnd);
+  const caretDelta = indentStr.length - oldIndentLen;
+  ta.value = newValue;
+  ta.selectionStart = pos + caretDelta;
+  ta.selectionEnd = pos + caretDelta;
+}
+
+let highlightTimer = null;
+function scheduleHighlight(immediate = false) {
+  const ta = $("code");
+  const pre = $("codeHighlight");
+  if (!ta || !pre) return;
+  if (highlightTimer) clearTimeout(highlightTimer);
+
+  const run = () => {
+    pre.innerHTML = tokenizeToHtml(ta.value ?? "");
+    pre.scrollTop = ta.scrollTop;
+    pre.scrollLeft = ta.scrollLeft;
+  };
+
+  if (immediate) run();
+  else highlightTimer = setTimeout(run, 50);
+}
+
+let lastKeyWasBrace = false;
+let isApplyingReindent = false;
+function installCodeEditor() {
+  const ta = $("code");
+  const pre = $("codeHighlight");
+  if (!ta || !pre) return;
+
+  // Initial render
+  scheduleHighlight(true);
+
+  // Keep overlay in sync with textarea scrolling
+  ta.addEventListener("scroll", () => {
+    pre.scrollTop = ta.scrollTop;
+    pre.scrollLeft = ta.scrollLeft;
+  });
+
+  ta.addEventListener("keydown", (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const insert = " ".repeat(INDENT_UNIT);
+      const start = ta.selectionStart ?? 0;
+      const end = ta.selectionEnd ?? 0;
+      const value = ta.value ?? "";
+      ta.value = value.slice(0, start) + insert + value.slice(end);
+      ta.selectionStart = ta.selectionEnd = start + insert.length;
+      scheduleHighlight();
+      return;
+    }
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const start = ta.selectionStart ?? 0;
+      const end = ta.selectionEnd ?? start;
+      const value = ta.value ?? "";
+      const level = braceLevelUpTo(value, start);
+      const indentStr = " ".repeat(level * INDENT_UNIT);
+      const insert = "\n" + indentStr;
+      ta.value = value.slice(0, start) + insert + value.slice(end);
+      ta.selectionStart = ta.selectionEnd = start + insert.length;
+      scheduleHighlight();
+      lastKeyWasBrace = false;
+      return;
+    }
+
+    if (e.key === "{" || e.key === "}") {
+      lastKeyWasBrace = true;
+    } else {
+      lastKeyWasBrace = false;
+    }
+  });
+
+  ta.addEventListener("input", () => {
+    scheduleHighlight();
+    if (!lastKeyWasBrace) return;
+    if (isApplyingReindent) return;
+    isApplyingReindent = true;
+    try {
+      reindentCurrentLine();
+    } finally {
+      isApplyingReindent = false;
+    }
+    scheduleHighlight(true);
+  });
 }
 
 async function runCode() {
@@ -261,6 +579,7 @@ function init() {
   $("runBtn").addEventListener("click", runCode);
   $("compileBtn").addEventListener("click", checkSyntax);
   $("formatBtn")?.addEventListener("click", formatCode);
+  installCodeEditor();
   document.querySelectorAll(".example, .example-card").forEach((el) => {
     el.addEventListener("click", () => setExample(el.dataset.name));
   });

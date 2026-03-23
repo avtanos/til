@@ -255,8 +255,95 @@ textarea {
 }
 
 .code-area {
+  min-height: auto;
+  background: transparent;
+}
+
+/* Sublime-like editor: overlay highlighter + auto formatting */
+.code-editor {
+  position: relative;
   min-height: 420px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
   background: #fbfdff;
+  overflow: hidden;
+}
+
+.code-editor .code-highlight {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  white-space: pre;
+  font: 14px/1.65 "JetBrains Mono", Consolas, ui-monospace, monospace;
+  color: var(--text);
+  pointer-events: none;
+}
+
+.code-editor .code-text {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--text);
+  overflow: auto;
+  font: 14px/1.65 "JetBrains Mono", Consolas, ui-monospace, monospace;
+}
+
+.code-editor .code-text:focus {
+  outline: none;
+}
+
+/* Token colors (special words + symbols) */
+.tok-kw {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.tok-type {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.tok-fn {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tok-bool {
+  color: #0d9b9b;
+  font-weight: 700;
+}
+
+.tok-num {
+  color: #2563eb;
+}
+
+.tok-str {
+  color: #db2777;
+}
+
+.tok-comment {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.tok-op {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tok-punct {
+  color: var(--text);
+  opacity: 0.9;
 }
 
 .input-area {
