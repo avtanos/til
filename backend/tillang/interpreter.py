@@ -74,8 +74,10 @@ class Interpreter:
         self.max_call_depth = max_call_depth
         self.start_time = time.monotonic()
 
-        # token-based input MVP
-        self.input_tokens = input_text.split()
+        # Line-based input:
+        # - allows sentences with spaces to be read as a single `окуу()` value
+        # - each `окуу()` consumes the next input line
+        self.input_lines = input_text.splitlines()
         self.input_i = 0
 
         # runtime output
@@ -348,11 +350,11 @@ class Interpreter:
     # -------------------- Expressions --------------------
 
     def _read_input_token(self) -> str:
-        if self.input_i >= len(self.input_tokens):
+        if self.input_i >= len(self.input_lines):
             raise TILRuntimeError("Ката: киргизүү жетишсиз.")
-        tok = self.input_tokens[self.input_i]
+        line = self.input_lines[self.input_i]
         self.input_i += 1
-        return tok
+        return line
 
     def _eval_expr(self, e: Expr):
         if isinstance(e, Literal):

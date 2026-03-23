@@ -43,9 +43,16 @@ class CompileRequest(BaseModel):
     code: str
 
 
+class Diagnostic(BaseModel):
+    message: str
+    line: int | None = None
+    column: int | None = None
+
+
 class CompileResponse(BaseModel):
     ok: bool
     error: str | None = None
+    diagnostics: list[Diagnostic] = []
 
 
 @app.on_event("startup")
@@ -76,13 +83,14 @@ def api_compile(req: CompileRequest):
     """Проверка синтаксиса и семантики без выполнения."""
     code = (req.code or "").strip()
     if not code:
-        return CompileResponse(ok=False, error="Ката: код пуст.")
+        return CompileResponse(ok=False, error="Ката: код пуст.", diagnostics=[])
     try:
         ast = parse(code)
         compile_program(ast)
-        return CompileResponse(ok=True, error=None)
+        return CompileResponse(ok=True, error=None, diagnostics=[])
     except TILCompileError as e:
-        return CompileResponse(ok=False, error=str(e))
+        diag = Diagnostic(message=e.message, line=e.line, column=e.column)
+        return CompileResponse(ok=False, error=str(e), diagnostics=[diag])
 
 
 @app.post("/api/run", response_model=RunResponse)

@@ -104,6 +104,7 @@ const examples = {
 function setExample(name) {
   $("code").value = examples[name] ?? "";
   scheduleHighlight(true);
+  scheduleSyntaxCheck();
 }
 
 function formatCode() {
@@ -154,6 +155,7 @@ function formatCode() {
   // Avoid extra newline at the end (Textarea will display it anyway if user needs).
   textarea.value = out.join("\n").replace(/\s+$/g, "");
   scheduleHighlight(true);
+  scheduleSyntaxCheck();
 }
 
 // -----------------------------
@@ -215,6 +217,21 @@ function tokenizeToHtml(code) {
     if (ch === "/" && code[i + 1] === "/") {
       let j = i + 2;
       while (j < len && code[j] !== "\n") j++;
+      out += wrapTok("tok-comment", code.slice(i, j));
+      i = j;
+      continue;
+    }
+
+    // Block comment /* ... */
+    if (ch === "/" && code[i + 1] === "*") {
+      let j = i + 2;
+      while (j < len) {
+        if (code[j] === "*" && code[j + 1] === "/") {
+          j += 2;
+          break;
+        }
+        j++;
+      }
       out += wrapTok("tok-comment", code.slice(i, j));
       i = j;
       continue;
@@ -315,6 +332,7 @@ function braceLevelUpTo(text, index) {
   // Counts `{` and `}` outside of strings/comments.
   let level = 0;
   let inLineComment = false;
+  let inBlockComment = false;
   let inDouble = false;
   let inSingle = false;
 
@@ -324,6 +342,14 @@ function braceLevelUpTo(text, index) {
 
     if (inLineComment) {
       if (ch === "\n") inLineComment = false;
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (ch === "*" && next === "/") {
+        inBlockComment = false;
+        i++; // consume '/'
+      }
       continue;
     }
 
@@ -341,6 +367,12 @@ function braceLevelUpTo(text, index) {
     if (ch === "/" && next === "/") {
       inLineComment = true;
       i++; // consume second '/'
+      continue;
+    }
+
+    if (ch === "/" && next === "*") {
+      inBlockComment = true;
+      i++; // consume '*'
       continue;
     }
 
@@ -409,13 +441,141 @@ function scheduleHighlight(immediate = false) {
 
 let lastKeyWasBrace = false;
 let isApplyingReindent = false;
+
+let syntaxDebounceTimer = null;
+function scheduleSyntaxCheck() {
+  if (syntaxDebounceTimer) clearTimeout(syntaxDebounceTimer);
+  syntaxDebounceTimer = setTimeout(() => {
+    checkSyntax().catch(() => {
+      /* ignore */
+    });
+  }, 650);
+}
+
 function installCodeEditor() {
   const ta = $("code");
   const pre = $("codeHighlight");
+  const ac = $("autocomplete");
+  const acList = $("autocompleteList");
   if (!ta || !pre) return;
 
   // Initial render
   scheduleHighlight(true);
+
+  // ---------------- Autocomplete ----------------
+  let acItems = [];
+  let acIndex = 0;
+
+  function hideAutocomplete() {
+    if (!ac) return;
+    ac.hidden = true;
+    acItems = [];
+    acIndex = 0;
+  }
+
+  function setAutocompleteIndex(nextIdx) {
+    if (!acList) return;
+    const children = Array.from(acList.children);
+    children.forEach((el, i) => el.classList.toggle("active", i === nextIdx));
+  }
+
+  function showAutocomplete(items) {
+    if (!ac || !acList) return;
+    acItems = items;
+    acIndex = 0;
+    acList.innerHTML = "";
+
+    if (!items.length) {
+      hideAutocomplete();
+      return;
+    }
+
+    for (const item of items) {
+      const div = document.createElement("div");
+      div.className = "autocomplete-item";
+      div.textContent = item;
+      div.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // keep focus in textarea
+        acceptAutocomplete(item);
+      });
+      acList.appendChild(div);
+    }
+    setAutocompleteIndex(0);
+    ac.hidden = false;
+  }
+
+  function acceptAutocomplete(item) {
+    const value = ta.value ?? "";
+    const pos = ta.selectionStart ?? value.length;
+    // get prefix start
+    let start = pos;
+    while (start > 0 && WORD_CHAR_RE.test(value[start - 1])) start--;
+    const prefix = value.slice(start, pos);
+    if (!prefix) return;
+    const replaced = value.slice(0, start) + item + value.slice(pos);
+    ta.value = replaced;
+    ta.selectionStart = ta.selectionEnd = start + item.length;
+    scheduleHighlight(true);
+    hideAutocomplete();
+    scheduleSyntaxCheck();
+  }
+
+  function collectSymbolsFromCode(code) {
+    const out = new Set();
+    // Keywords/types/builtins
+    TIL_TYPES.forEach((x) => out.add(x));
+    TIL_KEYWORDS.forEach((x) => out.add(x));
+    TIL_BOOLEANS.forEach((x) => out.add(x));
+    TIL_BUILTINS.forEach((x) => out.add(x));
+    out.add(TIL_MAIN_FN);
+
+    // User-defined functions
+    const fnRe = /\bфункция\s+([_\p{L}\p{M}][_\p{L}\p{M}\p{N}]*)\s*\(/gu;
+    let m;
+    while ((m = fnRe.exec(code)) !== null) {
+      out.add(m[1]);
+    }
+
+    // Variable declarations
+    const ident = "[_\\p{L}\\p{M}][_\\p{L}\\p{M}\\p{N}]*";
+    const primRe = new RegExp(`\\b(бүтүн|чыныгы|сап|белги|логикалык)\\s+(${ident})`, "gu");
+    while ((m = primRe.exec(code)) !== null) out.add(m[2]);
+
+    const listRe = new RegExp(`\\bтизме\\s*<[^>]*>\\s+(${ident})`, "gu");
+    while ((m = listRe.exec(code)) !== null) out.add(m[1]);
+
+    return Array.from(out);
+  }
+
+  function getPrefixInfo(value, pos) {
+    let start = pos;
+    while (start > 0 && WORD_CHAR_RE.test(value[start - 1])) start--;
+    const prefix = value.slice(start, pos);
+    return { start, prefix };
+  }
+
+  let autocompleteDebounce = null;
+  function scheduleAutocompleteUpdate() {
+    if (!ac) return;
+    if (autocompleteDebounce) clearTimeout(autocompleteDebounce);
+    autocompleteDebounce = setTimeout(() => {
+      const value = ta.value ?? "";
+      const pos = ta.selectionStart ?? value.length;
+      const { prefix } = getPrefixInfo(value, pos);
+      if (!prefix) {
+        hideAutocomplete();
+        return;
+      }
+
+      const symbols = collectSymbolsFromCode(value);
+      const filtered = symbols
+        .filter((s) => s.startsWith(prefix))
+        .slice(0, 16);
+
+      if (!filtered.length) hideAutocomplete();
+      else showAutocomplete(filtered);
+    }, 80);
+  }
 
   // Keep overlay in sync with textarea scrolling
   ta.addEventListener("scroll", () => {
@@ -425,6 +585,11 @@ function installCodeEditor() {
 
   ta.addEventListener("keydown", (e) => {
     if (e.key === "Tab") {
+      if (ac && ac.hidden === false && acItems.length) {
+        e.preventDefault();
+        acceptAutocomplete(acItems[acIndex] ?? acItems[0]);
+        return;
+      }
       e.preventDefault();
       const insert = " ".repeat(INDENT_UNIT);
       const start = ta.selectionStart ?? 0;
@@ -433,6 +598,14 @@ function installCodeEditor() {
       ta.value = value.slice(0, start) + insert + value.slice(end);
       ta.selectionStart = ta.selectionEnd = start + insert.length;
       scheduleHighlight();
+      return;
+    }
+
+    if (ac && ac.hidden === false && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      e.preventDefault();
+      const next = e.key === "ArrowDown" ? Math.min(acIndex + 1, acItems.length - 1) : Math.max(acIndex - 1, 0);
+      acIndex = next;
+      setAutocompleteIndex(acIndex);
       return;
     }
 
@@ -460,6 +633,8 @@ function installCodeEditor() {
 
   ta.addEventListener("input", () => {
     scheduleHighlight();
+    scheduleAutocompleteUpdate();
+    scheduleSyntaxCheck();
     if (!lastKeyWasBrace) return;
     if (isApplyingReindent) return;
     isApplyingReindent = true;
@@ -533,9 +708,17 @@ async function checkSyntax() {
     err.textContent = window.t ? window.t("syntax_ok") : "Синтаксис корректен.";
     err.className = "error-box compile-success";
   } else {
-    err.textContent = data.error ?? (window.t ? window.t("syntax_error_fallback") : "Ошибка проверки");
+    const first = Array.isArray(data.diagnostics) && data.diagnostics.length ? data.diagnostics[0] : null;
+    const loc =
+      first && first.line != null
+        ? ` (строка ${first.line}${first.column != null ? `, колонка ${first.column}` : ""})`
+        : "";
+    err.textContent =
+      (first ? first.message : data.error) ??
+      (window.t ? window.t("syntax_error_fallback") : "Ошибка проверки");
     err.className = "error-box";
     err.classList.remove("compile-success");
+    if (loc && !String(err.textContent).includes("строка")) err.textContent += loc;
   }
 }
 
@@ -549,7 +732,13 @@ function showTaskContext(task) {
   $("taskContextInput").textContent = task.example_in || "—";
   $("taskContextOutput").textContent = task.example_out || "—";
   ctx.style.display = "block";
-  if (task.example_in) $("input").value = task.example_in;
+  if (task.example_in) {
+    const raw = String(task.example_in ?? "");
+    // With line-based `окуу()`: numeric inputs should go one token per line.
+    // Heuristic: if example is only numbers separated by whitespace, convert to lines.
+    const numericOnly = /^-?\d+(\s+-?\d+)*$/u.test(raw.trim());
+    $("input").value = numericOnly ? raw.replace(/\s+/g, "\n") : raw;
+  }
 }
 
 async function loadTaskFromUrl() {
