@@ -105,6 +105,55 @@ function setExample(name) {
   $("code").value = examples[name] ?? "";
 }
 
+function formatCode() {
+  const textarea = $("code");
+  if (!textarea) return;
+
+  const src = textarea.value ?? "";
+  const normalized = src.replace(/\r\n?/g, "\n").replace(/\t/g, "    ");
+  const lines = normalized.split("\n");
+
+  const INDENT = 2; // spaces per indent level
+  let indent = 0;
+  const out = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedRight = line.replace(/\s+$/g, "");
+    const trimmed = trimmedRight.trim();
+
+    if (!trimmed) {
+      out.push("");
+      continue;
+    }
+
+    // Keep trailing comments (// ...) intact.
+    // Note: assumes comments don't contain string literals with `//`.
+    const commentIdx = trimmed.indexOf("//");
+    const codePart = commentIdx >= 0 ? trimmed.slice(0, commentIdx).trimEnd() : trimmed;
+    const commentPart = commentIdx >= 0 ? trimmed.slice(commentIdx).trimEnd() : "";
+
+    const closeLeadingMatch = codePart.match(/^}+/);
+    const closeLeading = closeLeadingMatch ? closeLeadingMatch[0].length : 0;
+
+    indent = Math.max(0, indent - closeLeading);
+
+    const openTotal = (codePart.match(/{/g) || []).length;
+    const closeTotal = (codePart.match(/}/g) || []).length;
+    const closeRest = Math.max(0, closeTotal - closeLeading);
+
+    const indentStr = " ".repeat(indent * INDENT);
+    const formattedLine = indentStr + codePart + (commentPart ? ` ${commentPart}` : "");
+    out.push(formattedLine);
+
+    // Indentation for subsequent lines: add for opens, subtract for closings after the line start.
+    indent = indent + openTotal - closeRest;
+  }
+
+  // Avoid extra newline at the end (Textarea will display it anyway if user needs).
+  textarea.value = out.join("\n").replace(/\s+$/g, "");
+}
+
 async function runCode() {
   const code = $("code").value;
   const input = $("input").value ?? "";
@@ -211,6 +260,7 @@ async function loadTaskFromUrl() {
 function init() {
   $("runBtn").addEventListener("click", runCode);
   $("compileBtn").addEventListener("click", checkSyntax);
+  $("formatBtn")?.addEventListener("click", formatCode);
   document.querySelectorAll(".example, .example-card").forEach((el) => {
     el.addEventListener("click", () => setExample(el.dataset.name));
   });
