@@ -31,11 +31,11 @@
             <a href="index.html" class="active"><span data-lang="ru">Редактор</span><span data-lang="kg">Редактор</span></a>
             <a href="tasks.html"><span data-lang="ru">Задачи</span><span data-lang="kg">Тапшырмалар</span></a>
             <a href="semantics.html"><span data-lang="ru">Семантика</span><span data-lang="kg">Семантика</span></a>
+            <a id="projectNavLink" href="project-kg.html"><span data-lang="kg">Долбоор жөнүндө</span><span data-lang="ru">О проекте</span></a>
           </nav>
 
           <div class="lang-switch">
-            <button id="ruBtn" class="active" type="button">Русский</button>
-            <button id="kgBtn" type="button">Кыргызча</button>
+            <button id="langToggleBtn" class="active" type="button" aria-label="Переключить язык интерфейса">RU</button>
           </div>
         </div>
       </header>
@@ -49,20 +49,6 @@
         </div>
       </div>
 
-      <section class="hero">
-        <h1>
-          <span data-lang="ru">Минимум действий, максимум понятности</span>
-          <span data-lang="kg">Аз аракет, көбүрөөк түшүнүктүүлүк</span>
-        </h1>
-        <p>
-          <span data-lang="ru">Запустите TIL сразу: код, ввод, вывод и ошибки — на одной странице.</span>
-          <span data-lang="ru">Миссия системы: учить программированию через короткие задания и мгновенную обратную связь.</span>
-
-          <span data-lang="kg">TILди дароо иштетиңиз: код, киргизүү, чыгаруу жана каталар — бир баракта.</span>
-          <span data-lang="kg">Системанын миссиясы: кыска тапшырмалар жана тез жооп аркылуу программалоону үйрөтүү.</span>
-        </p>
-      </section>
-
       <section class="layout">
         <div class="main">
           <div class="card">
@@ -70,6 +56,12 @@
               <div>
                 <h2><span data-lang="ru">Код</span><span data-lang="kg">Код</span></h2>
                 <p><span data-lang="ru">Основная рабочая область</span><span data-lang="kg">Негизги иш аймагы</span></p>
+              </div>
+              <div class="card-head-actions">
+                <button id="tilToggleBtn" class="chip-btn" type="button" aria-pressed="true">TIL</button>
+                <button id="cppToggleBtn" class="chip-btn" type="button" aria-pressed="false">C++</button>
+                <button id="pyToggleBtn" class="chip-btn" type="button" aria-pressed="false">Python</button>
+                <button id="javaToggleBtn" class="chip-btn" type="button" aria-pressed="false">Java</button>
               </div>
             </div>
             <div class="card-body">
@@ -84,6 +76,9 @@
     бүтүн b = окуу();
     чыгар(a + b);
 }</textarea>
+                <pre id="cppCode" class="code-area cpp-code" hidden></pre>
+                <pre id="pyCode" class="code-area py-code" hidden></pre>
+                <pre id="javaCode" class="code-area java-code" hidden></pre>
                 <div id="autocomplete" class="autocomplete" hidden>
                   <div id="autocompleteList" class="autocomplete-list"></div>
                 </div>
@@ -167,6 +162,11 @@
           </div>
         </aside>
       </section>
+
+      <footer class="site-footer">
+        <span data-lang="ru">© 2026 TIL. Все права защищены. Разработчик:</span><span data-lang="kg">© 2026 TIL. Бардык укуктар корголгон. Иштеп чыгуучу:</span>
+        <a href="https://tms.kg/" target="_blank" rel="noopener noreferrer">Тимсоф</a>
+      </footer>
     </div>
 
     <script src="config.js"></script>

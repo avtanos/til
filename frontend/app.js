@@ -116,10 +116,426 @@ const examples = {
 }`,
 };
 
+const cppExamples = {
+  min: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long n;
+  cin >> n;
+  cout << n;
+  return 0;
+}`,
+  cmp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long a, b;
+  cin >> a >> b;
+  if (a > b) {
+    cout << "чоң";
+  } else {
+    cout << "кичине";
+  }
+  return 0;
+}`,
+  sum: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long x;
+  cin >> x;
+  x += 5;
+  cout << x;
+  return 0;
+}`,
+  fact: `#include <bits/stdc++.h>
+using namespace std;
+
+long long fact(long long n) {
+  if (n <= 1) return 1;
+  return n * fact(n - 1);
+}
+
+int main() {
+  long long n;
+  cin >> n;
+  cout << fact(n);
+  return 0;
+}`,
+  while: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long n;
+  cin >> n;
+  while (n > 0) {
+    cout << n << "\\n";
+    --n;
+  }
+  return 0;
+}`,
+  dowhile: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long n;
+  cin >> n;
+  long long i = 0;
+  do {
+    cout << i << "\\n";
+    ++i;
+  } while (i < n);
+  return 0;
+}`,
+  logic: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long a, b;
+  cin >> a >> b;
+  if ((a > b) && (b > 0)) {
+    cout << "туура";
+  } else {
+    if (!(a > b)) {
+      cout << "күтө тур";
+    } else {
+      cout << "калп";
+    }
+  }
+  return 0;
+}`,
+  arrsum: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long n;
+  cin >> n;
+  vector<long long> a = {10, 20, 30, 40, 50};
+  long long s = 0;
+  for (long long i = 0; i < n; i += 1) {
+    if (i >= (long long)a.size()) break;
+    s += a[i];
+  }
+  cout << s;
+  return 0;
+}`,
+  strlen: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  string t;
+  getline(cin, t);
+  cout << (int)t.size();
+  return 0;
+}`,
+  cont: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  long long n;
+  cin >> n;
+  long long s = 0;
+  for (long long i = 0; i < n; i += 1) {
+    if (i % 2 == 0) continue;
+    s += i;
+    if (s > 1000) break;
+  }
+  cout << s;
+  return 0;
+}`,
+  class: `#include <bits/stdc++.h>
+using namespace std;
+
+struct Point {
+  long long x = 0;
+  double y = 0.0;
+};
+
+int main() {
+  Point p;
+  p.x = 5;
+  p.y = 3.14;
+  cout << p.x;
+  return 0;
+}`,
+  comments: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+  // линия комментарий
+  long long a = 7; /* блок комментарий */
+  cout << a;
+  return 0;
+}`,
+};
+
+const pythonExamples = {
+  min: `import sys
+
+data = sys.stdin.read().strip().split()
+if not data:
+    exit()
+n = int(data[0])
+print(n)`,
+  cmp: `import sys
+
+data = sys.stdin.read().strip().split()
+a = int(data[0])
+b = int(data[1])
+print("чоң" if a > b else "кичине")`,
+  sum: `import sys
+
+data = sys.stdin.read().strip().split()
+x = int(data[0])
+x += 5
+print(x)`,
+  fact: `import sys
+
+def fact(n: int) -> int:
+    if n <= 1:
+        return 1
+    return n * fact(n - 1)
+
+data = sys.stdin.read().strip().split()
+n = int(data[0])
+print(fact(n))`,
+  while: `import sys
+
+data = sys.stdin.read().strip().split()
+n = int(data[0])
+while n > 0:
+    print(n)
+    n -= 1`,
+  dowhile: `import sys
+
+data = sys.stdin.read().strip().split()
+n = int(data[0])
+i = 0
+while True:
+    print(i)
+    i += 1
+    if i < n:
+        continue
+    break`,
+  logic: `import sys
+
+data = sys.stdin.read().strip().split()
+a = int(data[0])
+b = int(data[1])
+if (a > b) and (b > 0):
+    print("туура")
+else:
+    if not (a > b):
+        print("күтө тур")
+    else:
+        print("калп")`,
+  arrsum: `import sys
+
+data = sys.stdin.read().strip().split()
+n = int(data[0])
+a = [10, 20, 30, 40, 50]
+s = 0
+for i in range(n):
+    if i >= len(a):
+        break
+    s += a[i]
+print(s)`,
+  strlen: `import sys
+
+t = sys.stdin.readline().rstrip("\\n")
+print(len(t))`,
+  cont: `import sys
+
+data = sys.stdin.read().strip().split()
+n = int(data[0])
+s = 0
+for i in range(n):
+    if i % 2 == 0:
+        continue
+    s += i
+    if s > 1000:
+        break
+print(s)`,
+  class: `# Пример без ввода.
+
+class Point:
+    def __init__(self):
+        self.x = 5
+        self.y = 3.14
+
+p = Point()
+print(p.x)`,
+  comments: `# линия комментарий
+# блок комментарий:  /* ... */
+
+a = 7
+print(a)`,
+};
+
+const javaExamples = {
+  min: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    System.out.print(n);
+  }
+}`,
+  cmp: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long a = sc.nextLong();
+    long b = sc.nextLong();
+    System.out.print(a > b ? "чоң" : "кичине");
+  }
+}`,
+  sum: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long x = sc.nextLong();
+    x += 5;
+    System.out.print(x);
+  }
+}`,
+  fact: `import java.util.*;
+
+public class Main {
+  static long fact(long n) {
+    if (n <= 1) return 1;
+    return n * fact(n - 1);
+  }
+
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    System.out.print(fact(n));
+  }
+}`,
+  while: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    while (n > 0) {
+      System.out.println(n);
+      n -= 1;
+    }
+  }
+}`,
+  dowhile: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    long i = 0;
+    do {
+      System.out.println(i);
+      i += 1;
+    } while (i < n);
+  }
+}`,
+  logic: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long a = sc.nextLong();
+    long b = sc.nextLong();
+    if ((a > b) && (b > 0)) {
+      System.out.print("туура");
+    } else {
+      if (!(a > b)) {
+        System.out.print("күтө тур");
+      } else {
+        System.out.print("калп");
+      }
+    }
+  }
+}`,
+  arrsum: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    long[] a = new long[] {10, 20, 30, 40, 50};
+    long s = 0;
+    for (long i = 0; i < n; i += 1) {
+      if (i >= a.length) break;
+      s += a[(int)i];
+    }
+    System.out.print(s);
+  }
+}`,
+  strlen: `import java.io.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String t = br.readLine();
+    if (t == null) t = "";
+    System.out.print(t.length());
+  }
+}`,
+  cont: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Scanner sc = new Scanner(System.in);
+    long n = sc.nextLong();
+    long s = 0;
+    for (long i = 0; i < n; i += 1) {
+      if (i % 2 == 0) continue;
+      s += i;
+      if (s > 1000) break;
+    }
+    System.out.print(s);
+  }
+}`,
+  class: `import java.util.*;
+
+class Point {
+  long x;
+  double y;
+  Point() {
+    x = 5;
+    y = 3.14;
+  }
+}
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    Point p = new Point();
+    System.out.print(p.x);
+  }
+}`,
+  comments: `public class Main {
+  public static void main(String[] args) throws Exception {
+    // линия комментарий
+    // блок комментарий: /* ... */
+    long a = 7;
+    System.out.print(a);
+  }
+}`,
+};
+
+let ACTIVE_EXAMPLE_KEY = "min";
+let EXT_MODE = "til"; // 'til' | 'cpp' | 'py' | 'java'
+
 function setExample(name) {
+  ACTIVE_EXAMPLE_KEY = name;
   $("code").value = examples[name] ?? "";
   scheduleHighlight(true);
   scheduleSyntaxCheck();
+  syncExternalView();
 }
 
 function formatCode() {
@@ -342,6 +758,73 @@ function tokenizeToHtml(code) {
   }
 
   return out;
+}
+
+function syncExternalView() {
+  const cppBtn = $("cppToggleBtn");
+  const tilBtn = $("tilToggleBtn");
+  const pyBtn = $("pyToggleBtn");
+  const javaBtn = $("javaToggleBtn");
+  const codeTa = $("code");
+  const hi = $("codeHighlight");
+  const cpp = $("cppCode");
+  const py = $("pyCode");
+  const java = $("javaCode");
+  const ac = $("autocomplete");
+
+  if (!codeTa || !hi || !cpp || !py || !java) return;
+
+  const show = (lang) => EXT_MODE === lang;
+
+  const setBtn = (btn, lang) => {
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", show(lang) ? "true" : "false");
+  };
+  setBtn(tilBtn, "til");
+  setBtn(cppBtn, "cpp");
+  setBtn(pyBtn, "py");
+  setBtn(javaBtn, "java");
+
+  const hideAll = () => {
+    cpp.hidden = true;
+    py.hidden = true;
+    java.hidden = true;
+  };
+
+  hideAll();
+
+  if (EXT_MODE === "til") {
+    codeTa.hidden = false;
+    hi.hidden = false;
+    if (ac) ac.hidden = true;
+    scheduleHighlight(true);
+    return;
+  }
+
+  codeTa.hidden = true;
+  hi.hidden = true;
+  if (ac) ac.hidden = true;
+
+  const snippetBase =
+    EXT_MODE === "cpp"
+      ? cppExamples
+      : EXT_MODE === "py"
+        ? pythonExamples
+        : javaExamples;
+
+  const snippet =
+    snippetBase[ACTIVE_EXAMPLE_KEY] ??
+    (window.getUILang && window.getUILang() === "ky"
+      ? "Бул бөлүк үчүн ушул тилдин мисалы азырынча жок."
+      : "This section doesn't have an example for the selected language yet.");
+
+  if (EXT_MODE === "cpp") cpp.textContent = snippet;
+  if (EXT_MODE === "py") py.textContent = snippet;
+  if (EXT_MODE === "java") java.textContent = snippet;
+
+  if (EXT_MODE === "cpp") cpp.hidden = false;
+  if (EXT_MODE === "py") py.hidden = false;
+  if (EXT_MODE === "java") java.hidden = false;
 }
 
 function braceLevelUpTo(text, index) {
@@ -670,17 +1153,47 @@ async function runCode() {
   $("output").textContent = "";
   $("error").textContent = "";
 
-  const resp = await fetch((window.TIL_API_BASE || '') + "/api/run", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code, input }),
-  });
-
   const noBackend = "Backend жетишсиз. Локально: cd backend && python -m uvicorn backend.app:app --port 8000";
+
+  async function postJsonWithApiFallback(path, payload) {
+    const localBase = "http://127.0.0.1:8000";
+    const primaryBase = window.TIL_API_BASE || "";
+
+    // Try in this order:
+    // 1) configured API base (if any)
+    // 2) same-origin relative URL (/api/...) (useful if backend is mounted on same host)
+    // 3) local dev backend (always last fallback)
+    const bases = [];
+    if (primaryBase) bases.push(primaryBase);
+    bases.push(""); // same-origin
+    if (!bases.includes(localBase)) bases.push(localBase);
+
+    let lastErr = null;
+    for (const base of bases) {
+      const url = base + path;
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 5000);
+      try {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal,
+        });
+        if (!resp.ok) continue;
+        return await resp.json();
+      } catch (e) {
+        lastErr = e;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+    throw lastErr || new Error("api request failed");
+  }
+
   let data;
   try {
-    data = resp.ok ? await resp.json() : null;
-    if (!data) throw new Error();
+    data = await postJsonWithApiFallback("/api/run", { code, input });
   } catch (_) {
     $("error").textContent = noBackend;
     $("error").className = "error-box";
@@ -702,17 +1215,43 @@ async function checkSyntax() {
   $("error").textContent = "";
   $("error").classList.remove("compile-success");
 
-  const resp = await fetch((window.TIL_API_BASE || '') + "/api/compile", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
-  });
-
   const noBackend = "Backend жетишсиз. Локально: cd backend && python -m uvicorn backend.app:app --port 8000";
+
+  async function postJsonWithApiFallback(path, payload) {
+    const localBase = "http://127.0.0.1:8000";
+    const primaryBase = window.TIL_API_BASE || "";
+
+    const bases = [];
+    if (primaryBase) bases.push(primaryBase);
+    bases.push("");
+    if (!bases.includes(localBase)) bases.push(localBase);
+
+    let lastErr = null;
+    for (const base of bases) {
+      const url = base + path;
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 5000);
+      try {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal,
+        });
+        if (!resp.ok) continue;
+        return await resp.json();
+      } catch (e) {
+        lastErr = e;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+    throw lastErr || new Error("api request failed");
+  }
+
   let data;
   try {
-    data = resp.ok ? await resp.json() : null;
-    if (!data) throw new Error();
+    data = await postJsonWithApiFallback("/api/compile", { code });
   } catch (_) {
     const err = $("error");
     err.textContent = noBackend;
@@ -786,6 +1325,22 @@ function init() {
   $("runBtn").addEventListener("click", runCode);
   $("compileBtn").addEventListener("click", checkSyntax);
   $("formatBtn")?.addEventListener("click", formatCode);
+  $("tilToggleBtn")?.addEventListener("click", () => {
+    EXT_MODE = "til";
+    syncExternalView();
+  });
+  $("cppToggleBtn")?.addEventListener("click", () => {
+    EXT_MODE = EXT_MODE === "cpp" ? "til" : "cpp";
+    syncExternalView();
+  });
+  $("pyToggleBtn")?.addEventListener("click", () => {
+    EXT_MODE = EXT_MODE === "py" ? "til" : "py";
+    syncExternalView();
+  });
+  $("javaToggleBtn")?.addEventListener("click", () => {
+    EXT_MODE = EXT_MODE === "java" ? "til" : "java";
+    syncExternalView();
+  });
   installCodeEditor();
   document.querySelectorAll(".example, .example-card").forEach((el) => {
     el.addEventListener("click", () => setExample(el.dataset.name));
@@ -796,6 +1351,9 @@ function init() {
       setExample("min");
     }
   });
+
+  // Ensure correct initial state on first load.
+  syncExternalView();
 }
 
 init();
