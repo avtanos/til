@@ -3,25 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TIL MVP — Кыргызча код жазуу</title>
+    <title>TIL CODE — Кыргызча код жазуу</title>
     <meta name="description" content="Кыргызча программалоо: программирование на кыргызском, праграммирование, Кыргызстан программиронвание, кодирование и курсы на кыргызском. Пишите и запускайте код на TIL — быстро и с обратной связью." />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#14d1d1" />
 
-    <meta property="og:title" content="TIL MVP — Кыргызча код жазуу" />
+    <meta property="og:title" content="TIL CODE — Кыргызча код жазуу" />
     <meta property="og:description" content="Кыргызча программалоо: программирование на кыргызском, праграммирование, Кыргызстан программиронвание, кодирование и курсы на кыргызском. TIL — пишите, запускайте и исправляйте ошибки." />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="TIL MVP" />
+    <meta property="og:site_name" content="TIL CODE" />
     <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="lang-kg">
     <div class="page">
       <header class="topbar">
         <a href="index.html" class="brand">
-          <img src="assets/logo.png" alt="TIL MVP — Кыргызча код жазуу" class="brand-logo" />
+          <img src="assets/logo.png" alt="TIL CODE — Кыргызча код жазуу" class="brand-logo" />
           <div class="brand-copy">
-            <strong>TIL MVP</strong>
+            <strong>TIL CODE</strong>
             <span>Кыргызча код жазуу</span>
           </div>
         </a>
@@ -70,11 +73,12 @@
               </div>
 
               <div class="code-editor">
+                <pre id="codeGutter" class="code-gutter" aria-hidden="true">1</pre>
                 <pre id="codeHighlight" class="code-highlight" aria-hidden="true"></pre>
                 <textarea id="code" class="code-area code-text" spellcheck="false">башкы() {
-    бүтүн a = окуу();
-    бүтүн b = окуу();
-    чыгар(a + b);
+  бүтүн a = окуу();
+  бүтүн b = окуу();
+  чыгар(a + b);
 }</textarea>
                 <pre id="cppCode" class="code-area cpp-code" hidden></pre>
                 <pre id="pyCode" class="code-area py-code" hidden></pre>
@@ -89,6 +93,7 @@
                   <button id="compileBtn" class="ghost-btn" type="button"><span data-lang="ru">Проверить</span><span data-lang="kg">Текшерүү</span></button>
                   <button id="runBtn" class="primary-btn" type="button"><span data-lang="ru">Запустить</span><span data-lang="kg">Иштетүү</span></button>
                   <button id="formatBtn" class="ghost-btn" type="button"><span data-lang="ru">Форматировать</span><span data-lang="kg">Форматтоо</span></button>
+                  <button id="editorThemeBtn" class="ghost-btn" type="button" aria-pressed="false" title="Тёмный режим редактора">Dark</button>
                 </div>
                 <div class="hint">
                   <span data-lang="ru">Кнопки рядом с редактором: «написал → запустил → исправил».</span>
@@ -152,12 +157,48 @@
           <div class="card">
             <div class="card-head">
               <div>
-                <h3><span data-lang="ru">Статус</span><span data-lang="kg">Статус</span></h3>
+                <h3><span data-lang="ru">Статус</span><span data-lang="kg">Абалы</span></h3>
                 <p><span data-lang="ru">Проверка и ошибки</span><span data-lang="kg">Текшерүү жана каталар</span></p>
               </div>
             </div>
             <div class="card-body stack">
               <div id="error" class="error-box"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h3><span data-lang="ru">Полезные ресурсы</span><span data-lang="kg">Пайдалуу булактар</span></h3>
+                <p><span data-lang="ru">Сайты для практики и обучения</span><span data-lang="kg">Окуу жана практика үчүн сайттар</span></p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display: grid; gap: 10px;">
+                <div>
+                  <a href="https://html.js.kg" target="_blank" rel="noopener noreferrer"><strong>html.js.kg</strong></a>
+                  <div style="color: var(--muted); font-size: 13px; margin-top: 4px;">
+                    <span data-lang="ru">HTML-теги на кыргызском: словарь и примеры.</span>
+                    <span data-lang="kg">HTML тегтери кыргызча: сөздүк жана мисалдар.</span>
+                  </div>
+                </div>
+
+                <div>
+                  <a href="https://www.w3schools.com/" target="_blank" rel="noopener noreferrer"><strong>W3Schools</strong></a>
+                  <div style="color: var(--muted); font-size: 13px; margin-top: 4px;">
+                    <span data-lang="ru">Справочник и интерактивные уроки по веб‑разработке.</span>
+                    <span data-lang="kg">Веб‑иштеп чыгуу боюнча колдонмо жана интерактивдүү сабактар.</span>
+                  </div>
+                </div>
+
+                <div>
+                  <a href="https://www.edx.org/" target="_blank" rel="noopener noreferrer"><strong>edX</strong></a>
+                  <div style="color: var(--muted); font-size: 13px; margin-top: 4px;">
+                    <span data-lang="ru">Онлайн‑курсы и сертификаты по программированию и IT.</span>
+                    <span data-lang="kg">Программалоо жана IT боюнча онлайн‑курстар жана сертификаттар.</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </aside>

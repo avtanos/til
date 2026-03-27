@@ -2,117 +2,117 @@ const $ = (id) => document.getElementById(id);
 
 const examples = {
   min: `башкы() {
-    бүтүн n = окуу();
-    чыгар(n);
+  бүтүн n = окуу();
+  чыгар(n);
 }`,
   cmp: `башкы() {
-    бүтүн a = окуу();
-    бүтүн b = окуу();
-    эгер (a > b) {
-        чыгар("чоң");
-    } болбосо {
-        чыгар("кичине");
-    }
+  бүтүн a = окуу();
+  бүтүн b = окуу();
+  эгер (a > b) {
+    чыгар("чоң");
+  } болбосо {
+    чыгар("кичине");
+  }
 }`,
   sum: `башкы() {
-    бүтүн x = окуу();
-    x += 5;
-    чыгар(x);
+  бүтүн x = окуу();
+  x += 5;
+  чыгар(x);
 }`,
 
   fact: `функция факт(бүтүн n) {
-    эгер (n <= 1) {
-        кайтар 1;
-    } болбосо {
-        кайтар n * факт(n - 1);
-    }
+  эгер (n <= 1) {
+    кайтар 1;
+  } болбосо {
+    кайтар n * факт(n - 1);
+  }
 }
 
 башкы() {
-    бүтүн n = окуу();
-    чыгар(факт(n));
+  бүтүн n = окуу();
+  чыгар(факт(n));
 }`,
 
   while: `башкы() {
-    бүтүн n = окуу();
-    качан (n > 0) {
-        чыгар(n);
-        --n;
-    }
+  бүтүн n = окуу();
+  качан (n > 0) {
+    чыгар(n);
+    --n;
+  }
 }`,
 
   dowhile: `башкы() {
-    бүтүн n = окуу();
-    бүтүн i = 0;
-    жаса {
-        чыгар(i);
-        ++i;
-    } качан (i < n);
+  бүтүн n = окуу();
+  бүтүн i = 0;
+  жаса {
+    чыгар(i);
+    ++i;
+  } качан (i < n);
 }`,
 
   logic: `башкы() {
-    бүтүн a = окуу();
-    бүтүн b = окуу();
-    эгер ((a > b) жана (b > 0)) {
-        чыгар("туура");
+  бүтүн a = окуу();
+  бүтүн b = окуу();
+  эгер ((a > b) жана (b > 0)) {
+    чыгар("туура");
+  } болбосо {
+    эгер (эмес (a > b)) {
+      чыгар("күтө тур");
     } болбосо {
-        эгер (эмес (a > b)) {
-            чыгар("күтө тур");
-        } болбосо {
-            чыгар("калп");
-        }
+      чыгар("калп");
     }
+  }
 }`,
 
   arrsum: `башкы() {
-    бүтүн n = окуу();
-    тизме<бүтүн> a = [10, 20, 30, 40, 50];
-    бүтүн s = 0;
-    үчүн (бүтүн i = 0; i < n; i += 1) {
-        эгер (i >= узундук(a)) {
-            токтот;
-        }
-        s += a[i];
+  бүтүн n = окуу();
+  тизме<бүтүн> a = [10, 20, 30, 40, 50];
+  бүтүн s = 0;
+  үчүн (бүтүн i = 0; i < n; i += 1) {
+    эгер (i >= узундук(a)) {
+      токтот;
     }
-    чыгар(s);
+    s += a[i];
+  }
+  чыгар(s);
 }`,
 
   strlen: `башкы() {
-    сап t = окуу();
-    чыгар(узундук(t));
+  сап t = окуу();
+  чыгар(узундук(t));
 }`,
 
   cont: `башкы() {
-    бүтүн n = окуу();
-    бүтүн s = 0;
-    үчүн (бүтүн i = 0; i < n; i += 1) {
-        эгер (i % 2 == 0) {
-            улантуу;
-        }
-        s += i;
-        эгер (s > 1000) {
-            токтот;
-        }
+  бүтүн n = окуу();
+  бүтүн s = 0;
+  үчүн (бүтүн i = 0; i < n; i += 1) {
+    эгер (i % 2 == 0) {
+      улантуу;
     }
-    чыгар(s);
+    s += i;
+    эгер (s > 1000) {
+      токтот;
+    }
+  }
+  чыгар(s);
 }`,
 
   class: `класс Point {
-    бүтүн x;
-    чыныгы y;
+  бүтүн x;
+  чыныгы y;
 }
 
 башкы() {
-    Point p;
-    p.x = 5;
-    p.y = 3.14;
-    чыгар(p.x);
+  Point p;
+  p.x = 5;
+  p.y = 3.14;
+  чыгар(p.x);
 }`,
 
   comments: `башкы() {
-    // линия комментарий
-    бүтүн a = 7; /* блок комментарий */
-    чыгар(a);
+  // линия комментарий
+  бүтүн a = 7; /* блок комментарий */
+  чыгар(a);
 }`,
 };
 
@@ -529,6 +529,29 @@ public class Main {
 
 let ACTIVE_EXAMPLE_KEY = "min";
 let EXT_MODE = "til"; // 'til' | 'cpp' | 'py' | 'java'
+let SHOW_WS = true;
+let EDITOR_DARK = false;
+
+function getActiveEditorText() {
+  const codeTa = $("code");
+  const cpp = $("cppCode");
+  const py = $("pyCode");
+  const java = $("javaCode");
+  if (EXT_MODE === "til") return codeTa ? (codeTa.value ?? "") : "";
+  if (EXT_MODE === "cpp") return cpp ? (cpp.textContent ?? "") : "";
+  if (EXT_MODE === "py") return py ? (py.textContent ?? "") : "";
+  return java ? (java.textContent ?? "") : "";
+}
+
+function updateLineGutter() {
+  const gutter = $("codeGutter");
+  if (!gutter) return;
+  const text = getActiveEditorText();
+  const lines = Math.max(1, String(text || "").split("\n").length);
+  let out = "";
+  for (let i = 1; i <= lines; i++) out += i + (i === lines ? "" : "\n");
+  gutter.textContent = out || "1";
+}
 
 function setExample(name) {
   ACTIVE_EXAMPLE_KEY = name;
@@ -536,6 +559,7 @@ function setExample(name) {
   scheduleHighlight(true);
   scheduleSyntaxCheck();
   syncExternalView();
+  updateLineGutter();
 }
 
 function formatCode() {
@@ -633,8 +657,16 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
+function escapeAndMarkWhitespace(s) {
+  const esc = escapeHtml(s);
+  if (!SHOW_WS) return esc;
+  return esc
+    .replace(/\t/g, '<span class="tok-ws">→</span>')
+    .replace(/ /g, '<span class="tok-ws">▁</span>');
+}
+
 function wrapTok(cls, text) {
-  return `<span class="${cls}">${escapeHtml(text)}</span>`;
+  return `<span class="${cls}">${escapeAndMarkWhitespace(text)}</span>`;
 }
 
 function tokenizeToHtml(code) {
@@ -733,7 +765,7 @@ function tokenizeToHtml(code) {
       else if (TIL_KEYWORDS.has(word)) out += wrapTok("tok-kw", word);
       else if (TIL_BOOLEANS.has(word)) out += wrapTok("tok-bool", word);
       else if (word === TIL_MAIN_FN || TIL_BUILTINS.has(word)) out += wrapTok("tok-fn", word);
-      else out += escapeHtml(word);
+      else out += escapeAndMarkWhitespace(word);
 
       i = j;
       continue;
@@ -753,7 +785,9 @@ function tokenizeToHtml(code) {
       continue;
     }
 
-    out += escapeHtml(ch);
+    if (SHOW_WS && ch === " ") out += '<span class="tok-ws">▁</span>';
+    else if (SHOW_WS && ch === "\t") out += '<span class="tok-ws">→</span>';
+    else out += escapeHtml(ch);
     i++;
   }
 
@@ -798,6 +832,7 @@ function syncExternalView() {
     hi.hidden = false;
     if (ac) ac.hidden = true;
     scheduleHighlight(true);
+    updateLineGutter();
     return;
   }
 
@@ -825,6 +860,8 @@ function syncExternalView() {
   if (EXT_MODE === "cpp") cpp.hidden = false;
   if (EXT_MODE === "py") py.hidden = false;
   if (EXT_MODE === "java") java.hidden = false;
+
+  updateLineGutter();
 }
 
 function braceLevelUpTo(text, index) {
@@ -932,6 +969,9 @@ function scheduleHighlight(immediate = false) {
     pre.innerHTML = tokenizeToHtml(ta.value ?? "");
     pre.scrollTop = ta.scrollTop;
     pre.scrollLeft = ta.scrollLeft;
+    const gutter = $("codeGutter");
+    if (gutter) gutter.scrollTop = ta.scrollTop;
+    updateLineGutter();
   };
 
   if (immediate) run();
@@ -960,6 +1000,7 @@ function installCodeEditor() {
 
   // Initial render
   scheduleHighlight(true);
+  updateLineGutter();
 
   // ---------------- Autocomplete ----------------
   let acItems = [];
@@ -1080,7 +1121,21 @@ function installCodeEditor() {
   ta.addEventListener("scroll", () => {
     pre.scrollTop = ta.scrollTop;
     pre.scrollLeft = ta.scrollLeft;
+    const gutter = $("codeGutter");
+    if (gutter) gutter.scrollTop = ta.scrollTop;
   });
+
+  // Keep gutter in sync for external language views as well
+  const syncGutterFrom = (el) => {
+    const gutter = $("codeGutter");
+    if (!el || !gutter) return;
+    el.addEventListener("scroll", () => {
+      gutter.scrollTop = el.scrollTop;
+    });
+  };
+  syncGutterFrom($("cppCode"));
+  syncGutterFrom($("pyCode"));
+  syncGutterFrom($("javaCode"));
 
   ta.addEventListener("keydown", (e) => {
     if (e.key === "Tab") {
@@ -1200,13 +1255,44 @@ async function runCode() {
     return;
   }
   if (data.status === "ok") {
-    $("output").textContent = data.output ?? "";
+    const out = data.output ?? "";
+    $("output").textContent = out;
+    trySaveSolvedAttempt(code, input, out);
   } else {
     const err = $("error");
     err.textContent = data.error ?? "Unknown error";
     err.className = "error-box";
     err.classList.remove("compile-success");
   }
+}
+
+let CURRENT_TASK = null;
+let CURRENT_TASK_SAMPLE_INPUT = null;
+
+function normalizeText(s) {
+  return String(s ?? "")
+    .replace(/\r\n?/g, "\n")
+    .trim()
+    .replace(/[ \t]+$/gm, "");
+}
+
+function trySaveSolvedAttempt(code, input, output) {
+  if (!CURRENT_TASK) return;
+  if (!CURRENT_TASK.example_out) return;
+
+  // Only judge against the sample input that we auto-filled for the task.
+  const expectedIn = CURRENT_TASK_SAMPLE_INPUT != null ? CURRENT_TASK_SAMPLE_INPUT : (CURRENT_TASK.example_in || "");
+  const okInput = normalizeText(input) === normalizeText(expectedIn);
+  if (!okInput) return;
+
+  const okOutput = normalizeText(output) === normalizeText(CURRENT_TASK.example_out);
+  if (!okOutput) return;
+
+  const key = "til_task_solution_v1:" + String(CURRENT_TASK.id);
+  const payload = { code: String(code ?? ""), savedAt: Date.now() };
+  try {
+    localStorage.setItem(key, JSON.stringify(payload));
+  } catch (_) {}
 }
 
 async function checkSyntax() {
@@ -1287,6 +1373,8 @@ function showTaskContext(task) {
   $("taskContextInput").textContent = task.example_in || "—";
   $("taskContextOutput").textContent = task.example_out || "—";
   ctx.style.display = "block";
+  CURRENT_TASK = task;
+  CURRENT_TASK_SAMPLE_INPUT = null;
   if (task.example_in) {
     const raw = String(task.example_in ?? "");
     // `окуу()` reads one input line per call: if the example contains multiple numbers separated by spaces,
@@ -1294,7 +1382,9 @@ function showTaskContext(task) {
     // Heuristic: if example is only numbers separated by whitespace, convert to lines.
     const numericOnly = /^-?\d+(\s+-?\d+)*$/u.test(raw.trim());
     const shouldSplit = numericOnly && !task.no_split_numeric_input;
-    $("input").value = shouldSplit ? raw.replace(/\s+/g, "\n") : raw;
+    const computed = shouldSplit ? raw.replace(/\s+/g, "\n") : raw;
+    $("input").value = computed;
+    CURRENT_TASK_SAMPLE_INPUT = computed;
   }
 }
 
@@ -1341,6 +1431,13 @@ function init() {
     EXT_MODE = EXT_MODE === "java" ? "til" : "java";
     syncExternalView();
   });
+
+  $("editorThemeBtn")?.addEventListener("click", () => {
+    EDITOR_DARK = !EDITOR_DARK;
+    $("editorThemeBtn")?.setAttribute("aria-pressed", EDITOR_DARK ? "true" : "false");
+    const ed = document.querySelector(".code-editor");
+    if (ed) ed.classList.toggle("dark", EDITOR_DARK);
+  });
   installCodeEditor();
   document.querySelectorAll(".example, .example-card").forEach((el) => {
     el.addEventListener("click", () => setExample(el.dataset.name));
@@ -1354,6 +1451,7 @@ function init() {
 
   // Ensure correct initial state on first load.
   syncExternalView();
+  updateLineGutter();
 }
 
 init();

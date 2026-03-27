@@ -15,7 +15,7 @@ from .storage import init_db, last_runs, save_run
 from .tillang.semantic import CompiledProgram
 
 
-app = FastAPI(title="TIL Platform MVP")
+app = FastAPI(title="TIL Platform KYRGYZ")
 
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
 

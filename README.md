@@ -1,32 +1,73 @@
-# TIL
+# TIL (Tili Programming Language)
 
-Олимпиадная платформа и язык программирования с кыргызскими ключевыми словами.
+TIL — учебно‑олимпиадная платформа и язык программирования с кыргызскими ключевыми словами. Цель проекта — снизить языковой барьер и помочь быстрее освоить алгоритмы и структуры данных.
+
+## Возможности
+
+- **Кыргызские ключевые слова**: `эгер`, `болбосо`, `кайтар`, `чыгар`, `үчүн`, `качан`, `жаса`, `токтот`, `улантуу`, `класс`
+- **Онлайн‑интерпретатор**: код → запуск → вывод/ошибки
+- **Задачи**: олимпиады + группы задач по семантике
+- **Типы**: `бүтүн`, `чыныгы`, `сап`, `белги`, `логикалык`, `тизме<тип>`, пользовательские классы
+- **Синтаксис**: `++/--`, `+=` и др., `obj.field` (в т.ч. цепочки `a.b.c`)
+- **Ввод**: `окуу()` читает построчно и учитывает ожидаемый тип (число/строка/список)
+- **Интерфейс**: двуязычный (RU/KG), предпросмотр примеров на TIL/C++/Python/Java, нумерация строк, подсветка пробелов/табов, тёмный режим редактора
 
 ## Локальный запуск
 
-```bash
-# Backend (FastAPI)
-cd backend && pip install -r requirements.txt && uvicorn app:app --reload
+### Backend (FastAPI)
 
-# Frontend — откройте frontend/index.html в браузере
+Из корня репозитория:
+
+```bash
+pip install -r backend/requirements.txt
+python -m uvicorn backend.app:app --reload --port 8000
 ```
 
-## Публикация на GitHub Pages
+Backend будет доступен на `http://127.0.0.1:8000`.
 
-1. Соберите статический сайт:
-   ```bash
-   python scripts/build_docs.py
-   ```
+### Frontend
 
-2. В репозитории: **Settings 胢↙ Pages** 胢↙ Source: **Deploy from a branch** 胢↙ Branch: `main` 胢↙ Folder: **/docs**.
+Фронтенд — статические HTML/JS/CSS файлы.
 
-3. После деплоя сайт будет доступен по адресу `https://<username>.github.io/<repo>/`.
+Варианты:
 
-### Режимы работы
+- Открыть `frontend/index.html` в браузере (для некоторых браузеров запросы к API могут блокироваться из‑за CORS/Origin).
+- Рекомендовано поднять простой сервер:
 
-- **Только статика** (без backend): страницы ꯂᜀ〄㐄〄䜄㠄숄», ꯂ℀㔄㰄〄㴄䈄㠄㨄〄숄» и редактор открываются; запуск кода недоступен.
-- **С backend**: разверните API (например, на Render, Railway или своём сервере), затем добавьте в `frontend/index.html` мета-тег:
-  ```html
-  <meta name="til-api" content="https://your-api-url.com">
-  ```
-  После пересборки (`python scripts/build_docs.py`) редактор будет отправлять запросы на ваш API.
+```bash
+python -m http.server 5173 --directory docs
+```
+
+Открыть:
+- `http://127.0.0.1:5173/index.html`
+- `http://127.0.0.1:5173/tasks.html`
+- `http://127.0.0.1:5173/semantics.html`
+
+## Настройка адреса API
+
+По умолчанию фронтенд берёт API из `window.TIL_API_BASE` (см. `frontend/config.js`).
+Для деплоя можно задать base URL через переменную `window.TIL_API_BASE` или через meta‑тег:
+
+```html
+<meta name="til-api" content="https://your-backend.example.com">
+```
+
+## GitHub Pages (статический сайт)
+
+Сайт публикуется из папки `docs/`.
+
+Пересборка статики:
+
+```bash
+python scripts/build_docs.py
+```
+
+Скрипт копирует `frontend/` в `docs/` и экспортирует `docs/tasks.json`.
+
+## Структура
+
+- `backend/` — FastAPI + компилятор/интерпретатор TIL
+- `frontend/` — исходники статического UI
+- `docs/` — сборка для GitHub Pages
+- `scripts/build_docs.py` — сборка `docs/`
+
