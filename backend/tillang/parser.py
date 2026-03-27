@@ -317,7 +317,13 @@ def parse_for(ps: ParserState) -> ForStmt:
 
     # init
     init: Stmt
-    if ps.peek().type in TYPE_TOKENS or ps.peek().type == TokenType.IDENT:
+    # Declaration: Type Name = expr
+    # - starts with builtin type token, OR
+    # - starts with IDENT that looks like a type name (class type), i.e. followed by IDENT or LT (тизме<...>)
+    tok0 = ps.peek()
+    tok1 = ps.peek(1)
+    is_decl = tok0.type in TYPE_TOKENS or (tok0.type == TokenType.IDENT and tok1.type in {TokenType.IDENT, TokenType.LT})
+    if is_decl:
         init_type = parse_type(ps)
         ident_tok = ps.expect(TokenType.IDENT, "Ожидалось имя переменной в init.")
         ps.expect(TokenType.ASSIGN, "Ожидался '=' в init.")
