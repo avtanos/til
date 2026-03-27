@@ -361,17 +361,20 @@ def parse_do_while(ps: ParserState) -> DoWhileStmt:
 
 def parse_lvalue(ps: ParserState) -> "VarRef | IndexRef | DotRef":
     ident_tok = ps.expect(TokenType.IDENT, "Ожидалась переменная.")
-    obj: Expr = VarRef(name=ident_tok.value, loc=_loc(ident_tok))
+    lv: VarRef | IndexRef | DotRef = VarRef(name=ident_tok.value, loc=_loc(ident_tok))
+
+    # Optional single index on base identifier: a[i]
     if ps.match(TokenType.LBRACKET) is not None:
         idx_expr = parse_expression(ps)
         ps.expect(TokenType.RBRACKET, "Ожидался ']' после индекса.")
-        obj = IndexExpr(array=obj, index=idx_expr, loc=obj.loc)
-    if ps.match(TokenType.DOT) is not None:
+        lv = IndexRef(array=VarRef(name=ident_tok.value, loc=_loc(ident_tok)), index=idx_expr, loc=_loc(ident_tok))
+
+    # Support chained field access for assignments: obj.field.subfield = ...
+    while ps.match(TokenType.DOT) is not None:
         field_tok = ps.expect(TokenType.IDENT, "Ожидалось поле.")
-        return DotRef(obj=obj, field=field_tok.value, loc=_loc(ident_tok))
-    if isinstance(obj, VarRef):
-        return obj
-    return IndexRef(array=obj.array, index=obj.index, loc=obj.loc)
+        lv = DotRef(obj=lvalue_to_expr(lv), field=field_tok.value, loc=_loc(field_tok))
+
+    return lv
 
 
 # -------------------- Expressions --------------------
