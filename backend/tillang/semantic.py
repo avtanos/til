@@ -444,6 +444,16 @@ def _infer_expr_type(
         rt = _infer_expr_type(e.right, env, functions, ret_types, expected=None, input_types=input_types, classes=classes)
         op = e.op
 
+        # String concatenation: if either side is string, `+` yields string.
+        # (Other side can be cast to string; see _check_cast_possible.)
+        if op == "+" and (lt.kind == TypeKind.STRING or rt.kind == TypeKind.STRING):
+            string_t = Type.from_name("сап")
+            if lt.kind != TypeKind.STRING:
+                _check_cast_possible(lt, string_t, e.loc)
+            if rt.kind != TypeKind.STRING:
+                _check_cast_possible(rt, string_t, e.loc)
+            return _check_expected_compat(string_t, expected, e.loc)
+
         if op in {"+", "-", "*", "/", "%"}:
             # During recursion or multi-pass inference, operand types might be UNKNOWN.
             # For MVP we allow UNKNOWN to participate in numeric expressions.

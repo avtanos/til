@@ -596,6 +596,12 @@ class Interpreter:
             left = self._eval_expr(e.left)
             right = self._eval_expr(e.right)
 
+            # String concatenation: if either operand is a string, `+` concatenates.
+            if e.op == "+" and (isinstance(left, str) or isinstance(right, str)):
+                return (left if isinstance(left, str) else self._format_value(left)) + (
+                    right if isinstance(right, str) else self._format_value(right)
+                )
+
             if e.op in {"+", "-", "*", "/"}:
                 if not isinstance(left, (int, float)) or not isinstance(right, (int, float)) or isinstance(left, bool) or isinstance(right, bool):
                     raise TILRuntimeError("Ката: арифметикалык операция сан үчүн гана иштейт.")
