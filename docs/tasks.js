@@ -18,6 +18,91 @@ const GROUP_LABELS = {
 };
 
 const SOLUTION_LS_PREFIX = "til_task_solution_v1:";
+const HINT_LS_PREFIX = "til_task_hint_step_v1:";
+
+const TASK_HINTS = {
+  base: [
+    {
+      ru: "Сначала внимательно выпиши вход и выход. Подумай, какое значение нужно посчитать и вывести.",
+      ky: "Адегенде киргизүү/чыгарууну так жаз. Кайсы маанини эсептеп чыгарыш керек экенин ойлон.",
+    },
+    {
+      ru: "Разбей задачу на шаги: прочитать → обработать → вывести. Не усложняй сразу.",
+      ky: "Тапшырманы кадамдарга бөл: окуу → иштетүү → чыгаруу. Дароо татаалдаштырба.",
+    },
+    {
+      ru: "Если нужно выбрать вариант, попробуй использовать условие (эгер / болбосо).",
+      ky: "Эгер тандоо керек болсо, шартты колдонуп көр (эгер / болбосо).",
+    },
+  ],
+  sem_incdec: [
+    {
+      ru: "++i и i++ увеличивают переменную на 1. Подумай, где важно «до» или «после» использования значения.",
+      ky: "++i жана i++ өзгөрмөнү 1ге көбөйтөт. Маани «алдын» же «кийин» колдонулушу маанилүүбү ойлон.",
+    },
+    {
+      ru: "Если счётчик меняется на 1 каждый раз — ++/-- делает код короче и понятнее.",
+      ky: "Эгер эсептегич ар жолу 1ге өзгөрсө — ++/-- кодду кыска жана түшүнүктүү кылат.",
+    },
+  ],
+  sem_assignop: [
+    {
+      ru: "x += y — это то же самое, что x = x + y. Удобно для накопления суммы/счётчика.",
+      ky: "x += y — бул x = x + y деген менен бирдей. Сумма/эсептегич топтоого ыңгайлуу.",
+    },
+    {
+      ru: "Если переменная постепенно изменяется — используй +=, -=, *= и т.д., чтобы показать намерение.",
+      ky: "Эгер өзгөрмө акырындык менен өзгөрсө — +=, -=, *= ж.б. колдонуп, ниетиңди так көрсөт.",
+    },
+  ],
+  sem_input: [
+    {
+      ru: "окуу() читает по строкам. Для чисел берётся первый токен, для сап — вся строка.",
+      ky: "окуу() сап боюнча окуйт. Сандар үчүн биринчи токен, сап үчүн бүт сап алынат.",
+    },
+    {
+      ru: "Проверь: сколько раз вызывается окуу() — столько строк ввода нужно ожидать.",
+      ky: "Текшер: окуу() канча жолу чакырылса — ошончо сап киргизүү керек.",
+    },
+  ],
+  sem_list: [
+    {
+      ru: "Список можно пройти циклом по индексам. Не забудь про узундук(a), чтобы не выйти за границы.",
+      ky: "Тизмени индекс менен циклде өтсө болот. узундук(a) текшерип, чекеден чыкпа.",
+    },
+    {
+      ru: "Если нужно хранить несколько значений — подумай о тизме<тип> и доступе a[i].",
+      ky: "Бир нече маанини сактоо керек болсо — тизме<тип> жана a[i] жөнүндө ойлон.",
+    },
+  ],
+  sem_class: [
+    {
+      ru: "класс — это шаблон. Поля доступны через точку: obj.field. Сначала создай объект, потом заполняй поля.",
+      ky: "класс — бул шаблон. Талаалар чекит аркылуу: obj.field. Адегенде объект түзүп, анан талааларын толтур.",
+    },
+    {
+      ru: "Если нужно сгруппировать данные (x и y вместе) — класс подходит лучше отдельных переменных.",
+      ky: "Маалыматты топтоо керек болсо (x жана y бирге) — класс өзүнчө өзгөрмөлөрдөн ыңгайлуу.",
+    },
+  ],
+};
+
+function hintKeyForTask(taskId) {
+  return HINT_LS_PREFIX + String(taskId);
+}
+
+function nextHintIndex(taskId, group, total) {
+  const key = hintKeyForTask(taskId);
+  let step = 0;
+  try {
+    step = parseInt(localStorage.getItem(key) || "0", 10) || 0;
+  } catch (_) {}
+  const idx = total ? step % total : 0;
+  try {
+    localStorage.setItem(key, String(step + 1));
+  } catch (_) {}
+  return idx;
+}
 
 function lsKeyForTask(taskId) {
   return SOLUTION_LS_PREFIX + String(taskId);
@@ -33,6 +118,107 @@ function getSavedSolution(taskId) {
   } catch (_) {
     return null;
   }
+}
+
+function ensureHintModal() {
+  let backdrop = document.getElementById("hintModalBackdrop");
+  if (backdrop) return backdrop;
+
+  backdrop = document.createElement("div");
+  backdrop.id = "hintModalBackdrop";
+  backdrop.className = "modal-backdrop";
+  backdrop.hidden = true;
+  backdrop.style.display = "none";
+  backdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="hintModalTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="hintModalTitle"></div>
+        <button type="button" class="ghost-btn modal-close-btn" data-modal-close="1" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre class="modal-pre modal-pre-wrap" id="hintModalText"></pre>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="ghost-btn" data-modal-close="1">
+          <span data-lang="ru">Закрыть</span><span data-lang="kg">Жабуу</span>
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+
+  const close = () => {
+    backdrop.hidden = true;
+    backdrop.style.display = "none";
+    document.body.classList.remove("modal-open");
+  };
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    const onClose = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    };
+    btn.addEventListener("click", onClose);
+    btn.addEventListener("pointerdown", onClose);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && backdrop.hidden === false) close();
+  });
+
+  return backdrop;
+}
+
+function typewriteTo(el, text) {
+  if (!el) return;
+  const full = String(text ?? "");
+  if (el._tilTypeTimer) clearInterval(el._tilTypeTimer);
+  el.textContent = "";
+  let i = 0;
+  const speed = 12;
+  el._tilTypeTimer = setInterval(() => {
+    i++;
+    el.textContent = full.slice(0, i);
+    if (i >= full.length) {
+      clearInterval(el._tilTypeTimer);
+      el._tilTypeTimer = null;
+    }
+  }, speed);
+}
+
+function openHintModal(task) {
+  const lang = window.getUILang ? window.getUILang() : "ru";
+  const isKy = lang === "ky";
+  const group = (task.group || "base");
+
+  const explicit = isKy ? task.hint_ky : task.hint;
+  const hasExplicit = typeof explicit === "string" && explicit.trim().length > 0;
+  const hints = TASK_HINTS[group] || TASK_HINTS.base;
+  const idx = nextHintIndex(task.id, group, hints.length);
+  const hintObj = hints[idx] || hints[0];
+  const hintText = hasExplicit ? explicit : (isKy ? hintObj.ky : hintObj.ru);
+
+  const backdrop = ensureHintModal();
+  const titleEl = document.getElementById("hintModalTitle");
+  const textEl = document.getElementById("hintModalText");
+
+  if (titleEl) {
+    const base = `${task.id}. ${isKy ? task.title_ky : task.title}`;
+    const suffix = isKy ? "— Ишара" : "— Подсказка";
+    titleEl.textContent = `${base} ${suffix}`;
+  }
+  if (textEl) {
+    typewriteTo(textEl, hintText);
+  }
+
+  backdrop.hidden = false;
+  backdrop.style.display = "flex";
+  document.body.classList.add("modal-open");
 }
 
 function ensureSolutionModal() {
@@ -201,6 +387,9 @@ function renderTasks() {
         </a>
 
         <div class="task-actions">
+          <button type="button" class="ghost-btn task-hint-btn" data-hint-task="${escapeHtml(String(t.id))}">
+            <span data-lang="ru">Подсказка</span><span data-lang="kg">Ишара</span>
+          </button>
           <button type="button" class="chip-btn task-solution-btn${has ? " task-solution-btn-has" : ""}" data-solution-task="${escapeHtml(String(t.id))}">
             <span data-lang="ru">Решение</span><span data-lang="kg">Чечим</span>
           </button>
@@ -212,6 +401,17 @@ function renderTasks() {
     `;
     })
     .join("");
+
+  list.querySelectorAll("[data-hint-task]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = btn.getAttribute("data-hint-task");
+      const task = ALL_TASKS.find((x) => String(x.id) === String(id));
+      if (!task) return;
+      openHintModal(task);
+    });
+  });
 
   list.querySelectorAll("[data-solution-task]").forEach((btn) => {
     btn.addEventListener("click", (e) => {

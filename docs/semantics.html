@@ -51,6 +51,165 @@
         </p>
       </header>
 
+      <section class="semantics-section" id="semAiTools">
+        <h2><span data-lang="ru">AI-ассистент</span><span data-lang="kg">AI-ассистент</span></h2>
+        <div class="bilingual" style="grid-template-columns: 1fr;">
+          <div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 10px 0 12px;">
+              <select id="semTopic" class="ghost-btn" style="padding: 10px 12px;">
+                <option value="types">Типы / Түрлөр</option>
+                <option value="if">эгер / if</option>
+                <option value="for">үчүн / for</option>
+                <option value="while">качан / while</option>
+                <option value="do">жаса..качан / do-while</option>
+                <option value="logic">логика / логика</option>
+                <option value="io">окуу()/чыгар()</option>
+                <option value="list">тизме / list</option>
+                <option value="class">класс / class</option>
+                <option value="ops">++/--, +=</option>
+                <option value="comments">комментарии</option>
+              </select>
+
+              <button id="semExplainKidBtn" type="button" class="chip-btn">
+                <span data-lang="ru">Объясни простыми словами</span><span data-lang="kg">Жөнөкөй тил менен түшүндүр</span>
+              </button>
+              <button id="semMoreExamplesBtn" type="button" class="chip-btn">
+                <span data-lang="ru">Показать больше примеров</span><span data-lang="kg">Көбүрөөк мисал</span>
+              </button>
+              <button id="semPlanBtn" type="button" class="ghost-btn">
+                <span data-lang="ru">Составить мой план</span><span data-lang="kg">Окуу планын түзүү</span>
+              </button>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 0 0 12px;">
+              <input id="semQuestion" class="ghost-btn" style="flex:1; min-width: 240px; padding: 10px 12px;" placeholder="чем 'эгер' отличается от while?" />
+              <button id="semAskBtn" type="button" class="chip-btn">
+                <span data-lang="ru">Спросить</span><span data-lang="kg">Суроо берүү</span>
+              </button>
+            </div>
+
+            <pre id="semAiOut" class="modal-pre modal-pre-wrap" style="min-height: 120px;"></pre>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 10px;">
+              <button id="semCopyOutBtn" type="button" class="ghost-btn" style="display:none;">
+                <span data-lang="ru">Копировать план</span><span data-lang="kg">Планды көчүрүү</span>
+              </button>
+              <button id="semDownloadOutBtn" type="button" class="ghost-btn" style="display:none;">
+                <span data-lang="ru">Скачать план</span><span data-lang="kg">Планды жүктөп алуу</span>
+              </button>
+              <div class="small muted" id="semAiStatus"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="planWizardBackdrop" class="modal-backdrop" hidden style="display:none;">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planWizardTitle">
+          <div class="modal-head">
+            <div class="modal-title" id="planWizardTitle">
+              <span data-lang="ru">Составить мой план</span><span data-lang="kg">Окуу планын түзүү</span>
+            </div>
+            <button type="button" class="ghost-btn modal-close-btn" id="planWizardCloseBtn" aria-label="Close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="small muted" id="planWizardStepLabel"></div>
+
+            <div id="planStep1" class="plan-step">
+              <h3 style="margin: 10px 0 8px;"><span data-lang="ru">Шаг 1. Кто вы?</span><span data-lang="kg">1-кадам. Сиз кимсиз?</span></h3>
+              <div class="stack">
+                <label><input type="radio" name="who" value="beginner" checked /> <span data-lang="ru">Я начинающий</span><span data-lang="kg">Мен башталгычмын</span></label>
+                <label><input type="radio" name="who" value="has_exp" /> <span data-lang="ru">У меня уже есть опыт</span><span data-lang="kg">Тажрыйбам бар</span></label>
+                <label><input type="radio" name="who" value="olymp" /> <span data-lang="ru">Готовлюсь к олимпиаде</span><span data-lang="kg">Олимпиадага даярданам</span></label>
+              </div>
+            </div>
+
+            <div id="planStep2" class="plan-step" style="display:none;">
+              <h3 style="margin: 10px 0 8px;"><span data-lang="ru">Шаг 2. Сколько времени есть?</span><span data-lang="kg">2-кадам. Канча убакыт бар?</span></h3>
+              <div class="stack">
+                <div>
+                  <div class="small muted"><span data-lang="ru">Срок обучения</span><span data-lang="kg">Мөөнөт</span></div>
+                  <select id="planDuration" class="ghost-btn" style="padding: 10px 12px; width: 100%; max-width: 360px;">
+                    <option value="2w">2 недели</option>
+                    <option value="1m" selected>1 месяц</option>
+                    <option value="3m">3 месяца</option>
+                    <option value="custom">свой срок</option>
+                  </select>
+                  <input id="planDurationCustom" class="ghost-btn" style="display:none; margin-top:10px; padding:10px 12px; width:100%; max-width: 360px;" placeholder="например: 6 недель" />
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:180px;">
+                    <div class="small muted"><span data-lang="ru">Дней в неделю</span><span data-lang="kg">Аптада күн</span></div>
+                    <select id="planDaysWeek" class="ghost-btn" style="padding: 10px 12px; width: 100%;">
+                      <option>2</option><option>3</option><option selected>5</option><option>6</option><option>7</option>
+                    </select>
+                  </div>
+                  <div style="flex:1; min-width:180px;">
+                    <div class="small muted"><span data-lang="ru">Раз в день</span><span data-lang="kg">Күнүнө жолу</span></div>
+                    <select id="planTimesDay" class="ghost-btn" style="padding: 10px 12px; width: 100%;">
+                      <option selected>1</option><option>2</option><option>3</option>
+                    </select>
+                  </div>
+                  <div style="flex:1; min-width:180px;">
+                    <div class="small muted"><span data-lang="ru">Минут за сессию</span><span data-lang="kg">Сессия (мүнөт)</span></div>
+                    <select id="planMinsSession" class="ghost-btn" style="padding: 10px 12px; width: 100%;">
+                      <option>15</option><option selected>30</option><option>45</option><option>60</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="planStep3" class="plan-step" style="display:none;">
+              <h3 style="margin: 10px 0 8px;"><span data-lang="ru">Шаг 3. Цель</span><span data-lang="kg">3-кадам. Максат</span></h3>
+              <div class="stack">
+                <label><input type="radio" name="goal" value="basics" checked /> <span data-lang="ru">Понимать основы</span><span data-lang="kg">Негиздерди түшүнүү</span></label>
+                <label><input type="radio" name="goal" value="tasks" /> <span data-lang="ru">Решать задачи</span><span data-lang="kg">Тапшырма чыгаруу</span></label>
+                <label><input type="radio" name="goal" value="code" /> <span data-lang="ru">Писать код самостоятельно</span><span data-lang="kg">Өз алдынча код жазуу</span></label>
+                <label><input type="radio" name="goal" value="contest" /> <span data-lang="ru">Подготовка к конкурсу</span><span data-lang="kg">Конкурс/олимпиада</span></label>
+              </div>
+            </div>
+
+            <div id="planStep4" class="plan-step" style="display:none;">
+              <h3 style="margin: 10px 0 8px;"><span data-lang="ru">Шаг 4. Как вам удобно?</span><span data-lang="kg">4-кадам. Кайсы ыңгайлуу?</span></h3>
+              <div class="stack">
+                <label><input type="checkbox" id="prefTheory" /> <span data-lang="ru">Больше теории</span><span data-lang="kg">Көбүрөөк теория</span></label>
+                <label><input type="checkbox" id="prefPractice" checked /> <span data-lang="ru">Больше практики</span><span data-lang="kg">Көбүрөөк практика</span></label>
+                <label><input type="checkbox" id="prefShort" /> <span data-lang="ru">Короткие уроки</span><span data-lang="kg">Кыска сабак</span></label>
+                <label><input type="checkbox" id="prefDetailed" /> <span data-lang="ru">Подробные объяснения</span><span data-lang="kg">Толук түшүндүрмө</span></label>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+                <div style="flex:1; min-width:220px;">
+                  <div class="small muted"><span data-lang="ru">Возрастная группа</span><span data-lang="kg">Курак</span></div>
+                  <select id="planAge" class="ghost-btn" style="padding: 10px 12px; width:100%;">
+                    <option value="school">школьник</option>
+                    <option value="student">студент</option>
+                    <option value="adult" selected>взрослый</option>
+                  </select>
+                </div>
+                <div style="flex:1; min-width:220px;">
+                  <div class="small muted"><span data-lang="ru">Язык интерфейса</span><span data-lang="kg">Интерфейс тили</span></div>
+                  <select id="planUiLang" class="ghost-btn" style="padding: 10px 12px; width:100%;">
+                    <option value="kg">кыргызский</option>
+                    <option value="ru" selected>русский</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="planStep5" class="plan-step" style="display:none;">
+              <h3 style="margin: 10px 0 8px;"><span data-lang="ru">Шаг 5. Подтверждение</span><span data-lang="kg">5-кадам. Ырастоо</span></h3>
+              <pre class="modal-pre modal-pre-wrap" id="planWizardSummary" style="min-height: 120px;"></pre>
+            </div>
+          </div>
+          <div class="modal-actions" style="justify-content: space-between;">
+            <button type="button" class="ghost-btn" id="planBackBtn"><span data-lang="ru">Назад</span><span data-lang="kg">Артка</span></button>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="ghost-btn" id="planNextBtn"><span data-lang="ru">Далее</span><span data-lang="kg">Кийинки</span></button>
+              <button type="button" class="chip-btn" id="planGenerateBtn" style="display:none;"><span data-lang="ru">Сгенерировать план</span><span data-lang="kg">Планды чыгаруу</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <section class="semantics-section">
         <h2>1. Типы данных / Маалымат түрлөрү</h2>
         <table class="syntax-table">
@@ -375,6 +534,8 @@ s += "b";   // конкатенация строк</pre>
         <a href="https://tms.kg/" target="_blank" rel="noopener noreferrer">TeamSoft</a>
       </footer>
     </div>
-    <script src="lang.js"></script>
+    <script src="config.js?v=20260401"></script>
+    <script src="lang.js?v=20260401"></script>
+    <script src="semantics.js?v=20260401"></script>
   </body>
 </html>

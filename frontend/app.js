@@ -116,6 +116,108 @@ const examples = {
 }`,
 };
 
+const AI_EXPLAINS = {
+  min: {
+    ru: `Это самый простой пример: программа читает одно число и выводит его обратно.\n\nАналогия: как «эхо» — что сказали, то и услышали.\n\nЗачем полезно: так проверяют, что ввод/вывод работает и функция башкы() запускается.`,
+    ky: `Бул эң жөнөкөй мисал: программа бир санды окуп, ошол эле санды кайра чыгарат.\n\nАналогия: «жаңырык» сыяктуу — эмне айтсаң, ошол кайтып келет.\n\nЭмне үчүн керек: киргизүү/чыгаруу иштеп жатканын жана башкы() ишке түшкөнүн текшерет.`,
+  },
+  cmp: {
+    ru: `Программа сравнивает два числа и выбирает один из двух вариантов через эгер / болбосо.\n\nАналогия: как весы — если левая сторона тяжелее, говорим «чоң», иначе «кичине».`,
+    ky: `Программа эки санды салыштырып, эгер / болбосо аркылуу эки варианттын бирин тандайт.\n\nАналогия: таразадай — сол тарабы оор болсо «чоң», болбосо «кичине».`,
+  },
+  sum: {
+    ru: `x += 5 означает «возьми текущее x и прибавь 5».\n\nАналогия: как копилка — было x монет, добавили ещё 5, стало больше.`,
+    ky: `x += 5 деген «x'тин азыркы маанисине 5 кош» дегенди билдирет.\n\nАналогия: чөнтөк/копилка — x монета бар эле, дагы 5 коштук.`,
+  },
+  fact: {
+    ru: `Это рекурсия: функция вызывает саму себя, уменьшая n, пока не дойдёт до базы (n <= 1).\n\nАналогия: матрёшка — открываешь одну, внутри следующая, пока не дойдёшь до самой маленькой.`,
+    ky: `Бул рекурсия: функция өзүн-өзү чакырып, n азая берет, базага (n <= 1) жеткенче.\n\nАналогия: матрёшка — бирин ачсаң, ичинен кийинкиси чыгат, эң кичинесине чейин.`,
+  },
+  while: {
+    ru: `Цикл качан (n > 0) повторяет действия, пока условие истинно. Здесь мы уменьшаем n через --n.\n\nАналогия: обратный отсчёт таймера — 5,4,3,2,1…`,
+    ky: `Качан (n > 0) цикли шарт чын болсо кайталай берет. Бул жерде --n менен n азайтылат.\n\nАналогия: таймердин артка санагы — 5,4,3,2,1…`,
+  },
+  dowhile: {
+    ru: `жаса { ... } качан (i < n) — цикл с постусловием: тело выполнится минимум один раз, потом проверка.\n\nАналогия: сначала пробуешь действие, а потом решаешь «делать ещё или хватит».`,
+    ky: `жаса { ... } качан (i < n) — постшарттуу цикл: денеси жок дегенде бир жолу аткарылат, анан текшерилет.\n\nАналогия: адегенде жасап көрөсүң, анан «дагы кыламбы же токтоймбу» деп чечесиң.`,
+  },
+  logic: {
+    ru: `Здесь несколько условий объединяются логикой: жана (И), же (ИЛИ), эмес (НЕ).\n\nАналогия: «чтобы войти, нужен билет И паспорт» — это жана. «Можно чай ИЛИ кофе» — это же.`,
+    ky: `Бул жерде бир нече шарт логика менен бириктирилет: жана (AND), же (OR), эмес (NOT).\n\nАналогия: «кирүү үчүн билет ЖАНА паспорт керек» — жана. «чай ЖЕ кофе» — же.`,
+  },
+  arrsum: {
+    ru: `Есть список a и мы складываем элементы по индексам a[i] в цикле.\n\nАналогия: как корзина с товарами — идём по позициям и считаем общую сумму.`,
+    ky: `a тизмеси бар, цикл ичинде индекс аркылуу a[i] элементтерин кошуп сумманы табабыз.\n\nАналогия: себеттеги буюмдардай — ар бир позицияны карап, жалпы сумманы эсептейбиз.`,
+  },
+  strlen: {
+    ru: `узундук(t) возвращает длину строки t.\n\nАналогия: как линейка для слова — сколько символов в тексте.`,
+    ky: `узундук(t) саптын узундугун кайтарат.\n\nАналогия: сөз үчүн сызгыч — канча белги бар экенин санайт.`,
+  },
+  cont: {
+    ru: `улантуу — пропустить текущую итерацию (continue), токтот — выйти из цикла (break).\n\nАналогия: идёшь по лестнице: «пропусти эту ступеньку» — улантуу, «остановись и выйди» — токтот.`,
+    ky: `улантуу — азыркы айланууну өткөрүп жиберүү (continue), токтот — циклден чыгуу (break).\n\nАналогия: тепкичтен чыккандай: «бул баскычты өткөр» — улантуу, «токто да чык» — токтот.`,
+  },
+  class: {
+    ru: `класс задаёт шаблон объекта (Point), а p.x и p.y — поля, куда мы записываем значения.\n\nАналогия: анкета/карточка: есть поля «x» и «y», мы их заполняем.`,
+    ky: `класс объекттин шаблонун аныктайт (Point), p.x жана p.y — маанилер жазыла турган талаалар.\n\nАналогия: анкета/карточкадай: «x» жана «y» талааларын толтурабыз.`,
+  },
+  comments: {
+    ru: `Комментарии не выполняются — они для людей. // до конца строки, /* ... */ блоком.\n\nАналогия: заметки на полях в тетради — помогают понять, но не меняют решение.`,
+    ky: `Комментарийлер аткарылбайт — адамдар үчүн. // саптын аягына чейин, /* ... */ блок түрүндө.\n\nАналогия: дептердеги четке жазылган эскертме — түшүндүрөт, бирок эсепти өзгөртпөйт.`,
+  },
+};
+
+const AI_EXPLAINS_DETAILED = {
+  min: {
+    ru: `Что происходит по шагам:\n1) башкы() — точка входа.\n2) окуу() читает строку ввода и берёт первый токен (для числа).\n3) значение кладётся в переменную n.\n4) чыгар(n) печатает n.\n\nПочему это важно:\n- Вы учитесь связывать «ввод → обработка → вывод».\n- Это базовый шаблон почти для любой задачи.\n\nАналогия:\nПредставьте кассу: вы называете число (ввод), кассир записывает (переменная), затем озвучивает чек (вывод).`,
+    ky: `Кадам-кадам менен эмне болот:\n1) башкы() — башталыш.\n2) окуу() киргизүүдөн сап окуйт да (сан үчүн) биринчи токенди алат.\n3) маани n өзгөрмөсүнө сакталат.\n4) чыгар(n) ошол n'ди чыгарат.\n\nЭмне үчүн маанилүү:\n- «киргизүү → иштетүү → чыгаруу» байланышын түшүнөсүз.\n- Көп тапшырмалар ушундай шаблондон башталат.\n\nАналогия:\nКассадай элестет: сан айтасың (киргизүү), кассир жазат (өзгөрмө), анан чек айтат (чыгаруу).`,
+  },
+  cmp: {
+    ru: `Идея:\nМы читаем a и b, затем проверяем условие a > b. Если условие истинно — выводим «чоң», иначе — «кичине».\n\nКак читать код как человек:\n- «эгер (a > b)» = «если a больше b».\n- «болбосо» = «иначе».\n\nТипичные ошибки:\n- Перепутать знак сравнения (>, <).\n- Забыть, что сравнение не меняет значения a и b, оно только выбирает ветку.\n\nАналогия:\nДва ученика встают на весы по очереди: кто тяжелее — тот «чоң».`,
+    ky: `Негизги ой:\na жана b окулат, анан a > b шартын текшеребиз. Шарт чын болсо «чоң», болбосо «кичине» чыгат.\n\nКодду адамча окуу:\n- «эгер (a > b)» = «эгер a b'ден чоң болсо».\n- «болбосо» = «болбосо (антпесе)».\n\nКөп кетчү каталар:\n- Белгини чаташтыруу (>, <).\n- Салыштыруу a, b'ни өзгөртпөйт — болгону кайсы бутак иштей турганын тандайт.\n\nАналогия:\nЭки киши таразага түшөт: ким оор — ошол «чоң».`,
+  },
+  sum: {
+    ru: `Что значит x += 5:\nЭто сокращение для x = x + 5.\n\nПочему так делают:\n- Короче писать.\n- Сразу видно, что x «накапливается».\n\nГде встречается:\n- Сумма, счётчик, накопление очков.\n\nАналогия:\nУ вас счётчик шагов: каждый день добавляется ещё 5 шагов — это и есть +=.`,
+    ky: `x += 5 эмнени билдирет:\nБул x = x + 5 дегендин кыска түрү.\n\nЭмне үчүн колдонулат:\n- Кыска жазылат.\n- x «топтолуп» жатканын дароо көрсөтөт.\n\nКайда кездешет:\n- сумма, эсептегич, упай топтоо.\n\nАналогия:\nКадам эсептегич: күн сайын дагы 5 кошулат — бул +=.`,
+  },
+  fact: {
+    ru: `Факториал n! = 1 * 2 * 3 * ... * n.\n\nРекурсиянын логикасы:\n- База: n <= 1 → 1.\n- Шаг: fact(n) = n * fact(n-1).\n\nПочему база обязательна:\nБез неё функция будет вызывать себя бесконечно.\n\nАналогия:\nВы поднимаетесь по лестнице вниз: пока не дойдёте до низа (база), вы продолжаете шагать.`,
+    ky: `Факториал n! = 1 * 2 * 3 * ... * n.\n\nРекурсиянын логикасы:\n- База: n <= 1 → 1.\n- Кадам: fact(n) = n * fact(n-1).\n\nЭмне үчүн база керек:\nБаза болбосо функция чексиз чакырыла берет.\n\nАналогия:\nТепкичтен ылдый түшкөндөй: түбүнө (базага) жеткенче кадам кыла бересиң.`,
+  },
+  while: {
+    ru: `Идея цикла:\nПока n > 0, печатаем n и уменьшаем его.\n\n++/--:\n--n уменьшает n на 1.\n\nТипичная логика:\n«пока условие верно — повторяй».\n\nАналогия:\nПесочные часы: пока песок не кончился, процесс идёт.`,
+    ky: `Циклдин ойу:\nn > 0 болуп турганда n чыгат да, n 1ге азаят.\n\n++/--:\n--n деген n'ди 1ге азайтат.\n\nТиптүү логика:\n«шарт чын болсо — кайтала».\n\nАналогия:\nКум саат: кум бүтө элек болсо, процесс уланат.`,
+  },
+  dowhile: {
+    ru: `Постусловие:\nСначала выполняем тело, потом проверяем i < n.\n\nКогда удобно:\nКогда минимум один запуск обязателен (например, меню, ввод до корректности).\n\nАналогия:\nСначала пробуете дверь, потом решаете: «ещё раз пробовать или хватит».`,
+    ky: `Постшарт:\nАлгач дене аткарылат, анан i < n текшерилет.\n\nКачан ыңгайлуу:\nЭң аз дегенде бир жолу иштеши керек болгондо (мисалы, меню, туура киргизүү чыкканча).\n\nАналогия:\nАдегенде эшикти түртөсүң, анан: «дагы аракет кылайынбы же болду» деп чечесиң.`,
+  },
+  logic: {
+    ru: `жана (AND): эки шарт тең чын болсо гана чын.\nже (OR): шарттардын бирөө чын болсо жетет.\nэмес (NOT): чынды жалганга, жалганды чынга айлантат.\n\nАналогия:\n- AND: «кирүү үчүн билет AND паспорт керек».\n- OR: «чай OR кофе тандайсың».\n- NOT: «эмес жаан» = «жаан эмес».`,
+    ky: `жана (AND): эки шарт тең чын болсо гана чын.\nже (OR): шарттардын бирөө чын болсо жетет.\nэмес (NOT): чынды жалганга, жалганды чынга айлантат.\n\nАналогия:\n- AND: «кирүү үчүн билет ЖАНА паспорт керек».\n- OR: «чай ЖЕ кофе тандайсың».\n- NOT: «эмес жаан» = «жаан эмес».`,
+  },
+  arrsum: {
+    ru: `Список и индекс:\n- a — список.\n- a[i] — элемент под номером i (с нуля).\n\nЧто делает код:\nМы идём i = 0..n-1 и добавляем a[i] в сумму s.\nЕсть защита: если i вышел за длину списка — токтот.\n\nАналогия:\nСписок — как полки в шкафу: i — номер полки, a[i] — вещь на полке.`,
+    ky: `Тизме жана индекс:\n- a — тизме.\n- a[i] — i номердеги элемент (0'дөн башталат).\n\nКод эмне кылат:\ni = 0..n-1 чейин барып, a[i] маанисин s'ке кошот.\nКоргоо бар: i узундуктан ашса — токтот.\n\nАналогия:\nТизме — текчелер: i — текченин номери, a[i] — текчедеги буюм.`,
+  },
+  strlen: {
+    ru: `узундук(t) — саптагы белгилердин саны.\n\nЭмнеге керек:\n- Текстти текшерүү, чектөөлөр, шарттар.\n\nАналогия:\nСөздүн «канча тамгасы бар?» деген суроо.`,
+    ky: `узундук(t) — саптагы белгилердин саны.\n\nЭмне үчүн керек:\n- текстти текшерүү, чектөөлөр, шарттар.\n\nАналогия:\nСөздүн «канча тамгасы бар?» деген суроо.`,
+  },
+  cont: {
+    ru: `улантуу (continue): ушул айланууну өткөрүп, кийинкисине өтөт.\nтоктот (break): циклден толук чыгат.\n\nКачан колдонулат:\n- «айрым учурларды эсептебей коеюн» (continue)\n- «жетиштүү болду, токтот» (break)\n\nАналогия:\nЖолдо: «бул бурулушту өткөр» — continue, «саякат бүттү» — break.`,
+    ky: `улантуу (continue): ушул айланууну өткөрүп, кийинкисине өтөт.\nтоктот (break): циклден толук чыгат.\n\nКачан колдонулат:\n- «айрым учурларды өткөрүп жиберейин» (continue)\n- «жетиштүү болду, токтот» (break)\n\nАналогия:\nЖолдо: «бул бурулушту өткөр» — continue, «саякат бүттү» — break.`,
+  },
+  class: {
+    ru: `Класс — бул «түр/шаблон».\nPoint ичинде x жана y талаалары бар.\n\nОбъект түзүү:\nPoint p; — p деген объект.\n\nТалаага жазуу/окуу:\np.x = 5; — x талаасын толтурдук.\nчыгар(p.x); — x'ти окуп чыгардык.\n\nАналогия:\nПаспорт сыяктуу: «аты», «жашы» деген талаалар бар, сен ошолорду толтурасың.`,
+    ky: `Класс — бул «түр/шаблон».\nPoint ичинде x жана y талаалары бар.\n\nОбъект түзүү:\nPoint p; — p деген объект.\n\nТалаага жазуу/окуу:\np.x = 5; — x талаасын толтурдук.\nчыгар(p.x); — x'ти окуп чыгардык.\n\nАналогия:\nПаспорт сыяктуу: «аты», «жашы» талаалары бар, сен ошолорду толтурасың.`,
+  },
+  comments: {
+    ru: `Комментарий — программа үчүн эмес, адам үчүн.\n\n// — саптын аягына чейин.\n/* ... */ — блок.\n\nКачан жазабыз:\n- Эмне үчүн бул чечим ушундай экенин түшүндүрүү.\n- Татаал жерлерди кийинки өзүңө/командага түшүндүрүү.\n\nАналогия:\nКитептеги закладка же карандаш менен жазылган эскертүү.`,
+    ky: `Комментарий — программа үчүн эмес, адам үчүн.\n\n// — саптын аягына чейин.\n/* ... */ — блок.\n\nКачан жазабыз:\n- Эмне үчүн бул чечим ушундай экенин түшүндүрүү.\n- Татаал жерлерди кийинки өзүңө/командага түшүндүрүү.\n\nАналогия:\nКитептеги закладка же карандаш менен жазылган эскертүү.`,
+  },
+};
+
 const cppExamples = {
   min: `#include <bits/stdc++.h>
 using namespace std;
@@ -1411,6 +1513,152 @@ async function loadTaskFromUrl() {
   } catch (_) {}
 }
 
+function ensureExplainModal() {
+  let backdrop = document.getElementById("aiExplainModalBackdrop");
+  if (backdrop) return backdrop;
+
+  backdrop = document.createElement("div");
+  backdrop.id = "aiExplainModalBackdrop";
+  backdrop.className = "modal-backdrop";
+  backdrop.hidden = true;
+  backdrop.style.display = "none";
+  backdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="aiExplainModalTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="aiExplainModalTitle"></div>
+        <button type="button" class="ghost-btn modal-close-btn" data-modal-close="1" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <pre class="modal-pre" id="aiExplainModalText"></pre>
+        <pre class="modal-pre" id="aiExplainModalCode" style="display:none; margin-top: 12px;"></pre>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="ghost-btn" id="aiExplainMoreBtn"></button>
+        <button type="button" class="chip-btn" id="aiExplainToggleCodeBtn"></button>
+        <button type="button" class="ghost-btn" data-modal-close="1">
+          <span data-lang="ru">Закрыть</span><span data-lang="kg">Жабуу</span>
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+
+  const close = () => {
+    backdrop.hidden = true;
+    backdrop.style.display = "none";
+    document.body.classList.remove("modal-open");
+  };
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    const onClose = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      close();
+    };
+    btn.addEventListener("click", onClose);
+    btn.addEventListener("pointerdown", onClose);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && backdrop.hidden === false) close();
+  });
+
+  return backdrop;
+}
+
+function typewriteTo(el, text) {
+  if (!el) return;
+  const full = String(text ?? "");
+  if (el._tilTypeTimer) clearInterval(el._tilTypeTimer);
+  el.textContent = "";
+  let i = 0;
+  const speed = 12; // ms per char (fast but readable)
+  el._tilTypeTimer = setInterval(() => {
+    i++;
+    el.textContent = full.slice(0, i);
+    if (i >= full.length) {
+      clearInterval(el._tilTypeTimer);
+      el._tilTypeTimer = null;
+    }
+  }, speed);
+}
+
+function openExplainModal(exampleKey) {
+  const lang = window.getUILang ? window.getUILang() : "ru";
+  const isKy = lang === "ky";
+  const data = AI_EXPLAINS[exampleKey] || null;
+  const detailed = AI_EXPLAINS_DETAILED[exampleKey] || null;
+
+  const backdrop = ensureExplainModal();
+  const titleEl = document.getElementById("aiExplainModalTitle");
+  const textEl = document.getElementById("aiExplainModalText");
+  const codeEl = document.getElementById("aiExplainModalCode");
+  const toggleBtn = document.getElementById("aiExplainToggleCodeBtn");
+  const moreBtn = document.getElementById("aiExplainMoreBtn");
+
+  const title = isKy ? "Түшүндүрмө" : "Объяснение";
+  if (titleEl) titleEl.textContent = title;
+  const baseText = !data
+    ? isKy
+      ? "Бул мисал үчүн түшүндүрмө азырынча жок."
+      : "Для этого примера объяснение пока не готово."
+    : isKy
+      ? data.ky
+      : data.ru;
+  typewriteTo(textEl, baseText);
+
+  // Setup "Show code" toggle
+  if (codeEl) {
+    codeEl.style.display = "none";
+    codeEl.textContent = examples[exampleKey] ?? "";
+  }
+  if (toggleBtn) {
+    toggleBtn.textContent = isKy ? "Мисалдын кодун көрсөтүү" : "Показать код примера";
+    toggleBtn.onclick = () => {
+      if (!codeEl) return;
+      const isOpen = codeEl.style.display !== "none";
+      codeEl.style.display = isOpen ? "none" : "block";
+      toggleBtn.textContent = isOpen
+        ? isKy
+          ? "Мисалдын кодун көрсөтүү"
+          : "Показать код примера"
+        : isKy
+          ? "Кодду жашыруу"
+          : "Скрыть код";
+    };
+  }
+
+  if (moreBtn) {
+    const hasDetailed = !!(detailed && (detailed.ky || detailed.ru));
+    moreBtn.textContent = isKy ? "Толугураак түшүндүр" : "Объяснить подробнее";
+    moreBtn.disabled = !hasDetailed;
+    moreBtn.onclick = () => {
+      const txt = !hasDetailed
+        ? baseText
+        : isKy
+          ? detailed.ky
+          : detailed.ru;
+      typewriteTo(textEl, txt);
+    };
+  }
+
+  backdrop.hidden = false;
+  backdrop.style.display = "flex";
+  document.body.classList.add("modal-open");
+}
+
+function refreshExplainButtonsText() {
+  const lang = window.getUILang ? window.getUILang() : "ru";
+  const isKy = lang === "ky";
+  document.querySelectorAll(".example-explain-btn").forEach((btn) => {
+    btn.textContent = isKy ? "Түшүндүр" : "Объяснить";
+  });
+}
+
 function init() {
   $("runBtn").addEventListener("click", runCode);
   $("compileBtn").addEventListener("click", checkSyntax);
@@ -1439,8 +1687,33 @@ function init() {
     if (ed) ed.classList.toggle("dark", EDITOR_DARK);
   });
   installCodeEditor();
+  // Add "Explain" buttons to quick examples (example-card)
+  document.querySelectorAll(".example-card").forEach((card) => {
+    if (card.querySelector(".example-explain-btn")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "example-explain-btn";
+    const lang = window.getUILang ? window.getUILang() : "ru";
+    const isKy = lang === "ky";
+    btn.textContent = isKy ? "Түшүндүр" : "Объяснить";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openExplainModal(card.dataset.name);
+    });
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    card.appendChild(btn);
+  });
+  refreshExplainButtonsText();
+
   document.querySelectorAll(".example, .example-card").forEach((el) => {
-    el.addEventListener("click", () => setExample(el.dataset.name));
+    el.addEventListener("click", (e) => {
+      if (e?.target?.closest && e.target.closest(".example-explain-btn")) return;
+      setExample(el.dataset.name);
+    });
   });
 
   loadTaskFromUrl().then(() => {
@@ -1452,6 +1725,9 @@ function init() {
   // Ensure correct initial state on first load.
   syncExternalView();
   updateLineGutter();
+
+  // Keep "Explain" labels in sync with language toggle
+  setInterval(refreshExplainButtonsText, 400);
 }
 
 init();

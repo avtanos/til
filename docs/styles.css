@@ -710,12 +710,31 @@ textarea {
 }
 
 .example-card {
+  position: relative;
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 14px;
   background: #fff;
   cursor: pointer;
   transition: 0.18s ease;
+}
+
+.example-explain-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.example-explain-btn:hover {
+  background: var(--panel-soft);
 }
 
 .example-card:hover {
@@ -860,6 +879,14 @@ body.lang-kg [data-lang="kg"] {
   flex-shrink: 0;
 }
 
+.task-hint-btn {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .task-solution-btn {
   padding: 6px 10px;
   border-radius: 10px;
@@ -998,6 +1025,12 @@ body.lang-kg [data-lang="kg"] {
   font: 13px/1.6 "JetBrains Mono", Consolas, ui-monospace, monospace;
   white-space: pre;
   color: var(--text);
+}
+
+.modal-pre-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .modal-actions {
